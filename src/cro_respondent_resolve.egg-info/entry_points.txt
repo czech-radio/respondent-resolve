@@ -1,0 +1,3 @@
+[console_scripts]
+cro-respondent-resolve = cro.respondent.resolve.__main__:main
+
