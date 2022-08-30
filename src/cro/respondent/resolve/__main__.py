@@ -4,7 +4,7 @@
 from flask import Flask
 from flask_restful import Resource,Api
 
-from cro.respondent.resolve import respondent
+# from cro.respondent.resolve import respondent
 
 import pandas as pd
 
