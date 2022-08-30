@@ -13,7 +13,6 @@ class Respondent:
     A class describing OpenMedia respodent
     """
 
-
     openmedia_id: str
     given_name: str
     family_name: Optional[str]

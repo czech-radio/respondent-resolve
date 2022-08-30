@@ -1,4 +1,3 @@
-
 from os import path
 
 from setuptools import find_namespace_packages, setup
@@ -23,8 +22,8 @@ setup(
     author="Krystof Pesek",
     description="Package resolving new to existing respondent entries.",
     long_description=f"{LONG_DESCRIPTION}",
-    package_dir={"":"src"},
-    packages=find_namespace_packages(where="src",include=[f"{NAMESPACE}.*"]),
+    package_dir={"": "src"},
+    packages=find_namespace_packages(where="src", include=[f"{NAMESPACE}.*"]),
     install_requires=[
         "numpy",
         "pandas",
@@ -34,5 +33,5 @@ setup(
         "console_scripts": [
             f"{PACKAGE_NAME}={PACKAGE_PATH}.__main__:main",
         ]
-    }
+    },
 )
