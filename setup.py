@@ -27,6 +27,8 @@ setup(
     install_requires=[
         "pandas",
         "flask-restful",
+        "psycopg2",
+        "loguru",
     ],
     extras_require={"dev": TEST_DEPS + LINT_DEPS + DOCS_DEPS},
     entry_points={
