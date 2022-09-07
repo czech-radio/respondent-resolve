@@ -7,7 +7,7 @@ from uuid import UUID
 __all__ = tuple(["Respondent", "Person"])
 
 
-class Respondent:
+class Respondent(object):
     """
     A class describing OpenMedia respodent
     """
@@ -37,6 +37,18 @@ class Respondent:
 
     def __eq__(self, that) -> bool:
         return self.openmedia_id == that.openmedia_id
+
+    def serialize(self):
+        return {
+            "openmedia_id": self.openmedia_id(),
+            "given_name": self.given_name(),
+            "family_name": self.family_name(),
+            "affiliation": self.affiliation(),
+            "gender": self.gender(),
+            "foreigner": self.foreigner(),
+            "labels": self.labels(),
+            "matching_ids": self.matching_ids(),
+        }
 
     @property
     def openmedia_id(self) -> str:

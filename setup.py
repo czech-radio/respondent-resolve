@@ -29,6 +29,8 @@ setup(
         "flask-restful",
         "psycopg2",
         "loguru",
+        "openpyxl",
+        "chardet",
     ],
     extras_require={"dev": TEST_DEPS + LINT_DEPS + DOCS_DEPS},
     entry_points={

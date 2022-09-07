@@ -1,5 +1,9 @@
+# -*- coding: utf-8 -*-
+
 import sys
 import datetime as dt
+
+import chardet
 
 from typing import List, Set
 import pandas as pd
@@ -7,32 +11,79 @@ import pandas.io.sql as sqlio
 import psycopg2 as db
 from loguru import logger
 
+
+from pandas import DataFrame
 from cro.respondent.resolve.domain import Respondent, Person
 from timeit import default_timer
-
-import xml.etree.ElementTree as xml
+from pathlib import Path
 
 # path to a new xml entries
-working_directory="/mnt/R/"
 
-# __all__ = tuple([
-# "load_respondents",
-# "load_persons",
-# "compare_persons_to_respondents",
-# ]
-# )
-
-
-def load_respondents(week_number: int) -> List[Respondent]:
-    tree = xml.parse("")
+__all__ = tuple(
+    [
+        "load_respondents",
+        "load_persons",
+        "cast_respodents_from_df",
+        "compare_persons_to_respondents",
+    ]
+)
 
 
-def create_connection_db(connection_str) -> db.connection:
+def load_respondents(year: int, week_number: int) -> List[Respondent]:
+
+    working_directory = f"/mnt/R/GŘ/Strategický rozvoj/Kancelář/Analytics/Source/{year}"
+    PATH = Path(working_directory)
+    FULL_PATH = PATH / f"DATA_{year}W{week_number}_TEST.xlsx"
+
+    df = pd.read_excel(
+        FULL_PATH,
+        sheet_name=0,
+        header=None,
+        engine="openpyxl",
+    )
+
+    print(f"Loaded {len(df)} respondents.")
+
+    respondents_raw = df.values.tolist()
+
+    contacts = []
+
+    for line in respondents_raw:
+        if line[0] == "contact":
+            print(f"adding {line}")
+            # contacts.append(line)
+
+            try:
+                contacts.append(
+                    Respondent(
+                        openmedia_id=line[19],
+                        given_name=line[20],
+                        family_name=line[21],
+                        labels=line[22],
+                        gender=line[23],
+                        foreigner=line[24],
+                        affiliation=line[25],
+                        matching_ids=[""],
+                    )
+                )
+            except:
+                print(f"Error parsing contact {line[0]}")
+
+    #   ...
+
+    return contacts
+
+
+def cast_respodents_from_df(dataframe: pd.DataFrame) -> List[Respondent]:
+    ...
+
+
+def create_connection_db(connection_str):
     with db.connect(connection_str) as connection:
         return connection
 
 
-def load_persons(connection: db.connection) -> pd.DataFrame:
+def load_persons(connection) -> List[Person]:
     try:
         logger.info("Loading respondent database started")
         persons = sqlio.read_sql_query(
@@ -40,12 +91,12 @@ def load_persons(connection: db.connection) -> pd.DataFrame:
             connection,
         )
         logger.info("Fetch respondents finished")
-        return persons
+
+        return persons.values.tolist()
+
     except Exception as ex:
         logger.error(ex)
         raise ex
-
-    return persons
 
 
 def compare_persons_to_respondents(
