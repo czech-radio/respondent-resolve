@@ -56,13 +56,13 @@ def load_respondents(year: int, week_number: int) -> List[Respondent]:
             try:
                 contacts.append(
                     Respondent(
-                        openmedia_id=line[19],
-                        given_name=line[20],
-                        family_name=line[21],
-                        labels=line[22],
-                        gender=line[23],
-                        foreigner=line[24],
-                        affiliation=line[25],
+                        openmedia_id=line[20],
+                        given_name=line[19],
+                        family_name=line[22],
+                        labels=line[23],
+                        gender=line[24],
+                        foreigner=line[25],
+                        affiliation=line[26],
                         matching_ids=[""],
                     )
                 )

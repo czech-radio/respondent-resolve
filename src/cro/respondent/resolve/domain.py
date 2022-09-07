@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 
+import json
 from dataclasses import dataclass
 from typing import Iterable, List, Optional, Tuple
 from uuid import UUID
 
-__all__ = tuple(["Respondent", "Person"])
+__all__ = tuple(["Respondent", "Person", "CustomJSONEncoder"])
 
 
 class Respondent(object):
@@ -38,17 +39,35 @@ class Respondent(object):
     def __eq__(self, that) -> bool:
         return self.openmedia_id == that.openmedia_id
 
-    def serialize(self):
+    def asdict(self):
         return {
-            "openmedia_id": self.openmedia_id(),
-            "given_name": self.given_name(),
-            "family_name": self.family_name(),
-            "affiliation": self.affiliation(),
-            "gender": self.gender(),
-            "foreigner": self.foreigner(),
-            "labels": self.labels(),
-            "matching_ids": self.matching_ids(),
+            "openmedia_id": self._openmedia_id,
+            "given_name": self._given_name,
+            "family_name": self._family_name,
+            "affiliation": self._affiliation,
+           "gender": self._gender,
+            "foreigner": self._foreigner,
+            "labels": self._labels,
+            "matching_ids": self._matching_ids,
         }
+
+
+    #def serialize(self, values_only = False):
+    #    if values_only:
+    #        return self.__dict__.values()
+    #    return self.__dict__
+
+    #def serialize(self):
+    #    return {
+    #        "openmedia_id": self.openmedia_id(),
+    #        "given_name": self.given_name(),
+    #        "family_name": self.family_name(),
+    #        "affiliation": self.affiliation(),
+    #       "gender": self.gender(),
+    #        "foreigner": self.foreigner(),
+    #        "labels": self.labels(),
+    #        "matching_ids": self.matching_ids(),
+    #    }
 
     @property
     def openmedia_id(self) -> str:
