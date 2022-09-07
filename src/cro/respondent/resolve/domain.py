@@ -45,19 +45,18 @@ class Respondent(object):
             "given_name": self._given_name,
             "family_name": self._family_name,
             "affiliation": self._affiliation,
-           "gender": self._gender,
+            "gender": self._gender,
             "foreigner": self._foreigner,
             "labels": self._labels,
             "matching_ids": self._matching_ids,
         }
 
-
-    #def serialize(self, values_only = False):
+    # def serialize(self, values_only = False):
     #    if values_only:
     #        return self.__dict__.values()
     #    return self.__dict__
 
-    #def serialize(self):
+    # def serialize(self):
     #    return {
     #        "openmedia_id": self.openmedia_id(),
     #        "given_name": self.given_name(),
