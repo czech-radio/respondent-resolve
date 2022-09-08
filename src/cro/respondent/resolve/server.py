@@ -2,13 +2,23 @@
 
 import pandas as pd
 import json
+import os
+
 
 from flask import Flask, request, jsonify
 
 from cro.respondent.resolve.domain import Respondent
 from cro.respondent.resolve.service import *
+from cro.respondent.resolve.service.respondents as respondents
+from cro.respondent.resolve.service.persons as persons
 
-respondents = []
+# get host sysvars
+AURA_TARGET_HOST = os.environ["AURA_TARGET_HOST"]
+AURA_TARGET_PORT = os.environ["AURA_TARGET_PASS"]
+AURA_TARGET_NAME = os.environ["AURA_TARGET_NAME"]
+AURA_TARGET_USER = os.environ["AURA_TARGET_USER"]
+AURA_TARGET_PASS = os.environ["AURA_TARGET_PASS"]
+
 
 server = Flask(__name__)
 
@@ -27,6 +37,11 @@ def get_respondents(year: int, week: int):
         output.append(respondent.asdict())
 
     return output
+
+@server.route("/persons", methods=["GET"])
+def get_persons():
+    con = create_connection_db(f"dbname={AURA_TARGET_NAME} user={AURA_TARGET_USER} host={AURA_TARGET_HOST} port={AURA_TARGET_PORT} password={AURA_TARGET_PASS}")
+    return load_persons(con)
 
 
 def create_app() -> Flask:

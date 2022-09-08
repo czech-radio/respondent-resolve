@@ -25,8 +25,15 @@ __all__ = tuple(
         "load_persons",
         "cast_respodents_from_df",
         "compare_persons_to_respondents",
+        "respondents",
+        "persons",
     ]
 )
+
+
+# glob memory storage init
+respondents = []
+persons = []
 
 
 def load_respondents(year: int, week_number: int) -> List[Respondent]:
@@ -42,19 +49,25 @@ def load_respondents(year: int, week_number: int) -> List[Respondent]:
         engine="openpyxl",
     )
 
+    df = extract_respodents_from_df(df)
     print(f"Loaded {len(df)} respondents.")
 
-    respondents_raw = df.values.tolist()
 
-    contacts = []
+    # print(f"Normalizing dataframe")
+    # ...
+
+    return respondents
+
+
+def extract_respodents_from_df(dataframe: pd.DataFrame) -> List[Respondent]:
+
+    respondents_raw = dataframe.values.tolist()
+
 
     for line in respondents_raw:
         if line[0] == "contact":
-            print(f"adding {line}")
-            # contacts.append(line)
-
             try:
-                contacts.append(
+                respondents.append(
                     Respondent(
                         openmedia_id=line[20],
                         given_name=line[19],
@@ -66,19 +79,13 @@ def load_respondents(year: int, week_number: int) -> List[Respondent]:
                         matching_ids=[""],
                     )
                 )
-            except:
+            except TypeError:
                 print(f"Error parsing contact {line[0]}")
 
-    #   ...
-
-    return contacts
+    return respondents_raw
 
 
-def cast_respodents_from_df(dataframe: pd.DataFrame) -> List[Respondent]:
-    ...
-
-
-def create_connection_db(connection_str):
+def create_connection_db(connection_str: str):
     with db.connect(connection_str) as connection:
         return connection
 
