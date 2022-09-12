@@ -36,9 +36,12 @@ def get_respondents(year: int, week: int):
 
     return output
 
+
 @server.route("/persons", methods=["GET"])
 def get_persons():
-    con = create_connection_db(f"dbname={AURA_TARGET_NAME} user={AURA_TARGET_USER} host={AURA_TARGET_HOST} port={AURA_TARGET_PORT} password={AURA_TARGET_PASS}")
+    con = create_connection_db(
+        f"dbname={AURA_TARGET_NAME} user={AURA_TARGET_USER} host={AURA_TARGET_HOST} port={AURA_TARGET_PORT} password={AURA_TARGET_PASS}"
+    )
     return load_persons(con)
 
 

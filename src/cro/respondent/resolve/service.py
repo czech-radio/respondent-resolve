@@ -41,7 +41,6 @@ def extract_respodents_from_df(dataframe: pd.DataFrame) -> List[Respondent]:
 
     respondents_raw = dataframe.values.tolist()
 
-
     for line in respondents_raw:
         if line[0] == "contact":
             try:
@@ -78,7 +77,6 @@ def load_respondents(year: int, week_number: int) -> List[Respondent]:
 
     df = extract_respodents_from_df(df)
     print(f"Loaded {len(df)} respondents.")
-
 
     # print(f"Normalizing dataframe")
     # ...
