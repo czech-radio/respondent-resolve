@@ -9,12 +9,10 @@ from flask import Flask, request, jsonify
 
 from cro.respondent.resolve.domain import Respondent
 from cro.respondent.resolve.service import *
-from cro.respondent.resolve.service.respondents as respondents
-from cro.respondent.resolve.service.persons as persons
 
 # get host sysvars
 AURA_TARGET_HOST = os.environ["AURA_TARGET_HOST"]
-AURA_TARGET_PORT = os.environ["AURA_TARGET_PASS"]
+AURA_TARGET_PORT = os.environ["AURA_TARGET_PORT"]
 AURA_TARGET_NAME = os.environ["AURA_TARGET_NAME"]
 AURA_TARGET_USER = os.environ["AURA_TARGET_USER"]
 AURA_TARGET_PASS = os.environ["AURA_TARGET_PASS"]

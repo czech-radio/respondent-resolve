@@ -23,7 +23,8 @@ __all__ = tuple(
     [
         "load_respondents",
         "load_persons",
-        "cast_respodents_from_df",
+        "create_connection_db",
+        "extract_respodents_from_df",
         "compare_persons_to_respondents",
         "respondents",
         "persons",
@@ -34,29 +35,6 @@ __all__ = tuple(
 # glob memory storage init
 respondents = []
 persons = []
-
-
-def load_respondents(year: int, week_number: int) -> List[Respondent]:
-
-    working_directory = f"/mnt/R/GŘ/Strategický rozvoj/Kancelář/Analytics/Source/{year}"
-    PATH = Path(working_directory)
-    FULL_PATH = PATH / f"DATA_{year}W{week_number}_TEST.xlsx"
-
-    df = pd.read_excel(
-        FULL_PATH,
-        sheet_name=0,
-        header=None,
-        engine="openpyxl",
-    )
-
-    df = extract_respodents_from_df(df)
-    print(f"Loaded {len(df)} respondents.")
-
-
-    # print(f"Normalizing dataframe")
-    # ...
-
-    return respondents
 
 
 def extract_respodents_from_df(dataframe: pd.DataFrame) -> List[Respondent]:
@@ -83,6 +61,29 @@ def extract_respodents_from_df(dataframe: pd.DataFrame) -> List[Respondent]:
                 print(f"Error parsing contact {line[0]}")
 
     return respondents_raw
+
+
+def load_respondents(year: int, week_number: int) -> List[Respondent]:
+
+    working_directory = f"/mnt/R/GŘ/Strategický rozvoj/Kancelář/Analytics/Source/{year}"
+    PATH = Path(working_directory)
+    FULL_PATH = PATH / f"DATA_{year}W{week_number}_TEST.xlsx"
+
+    df = pd.read_excel(
+        FULL_PATH,
+        sheet_name=0,
+        header=None,
+        engine="openpyxl",
+    )
+
+    df = extract_respodents_from_df(df)
+    print(f"Loaded {len(df)} respondents.")
+
+
+    # print(f"Normalizing dataframe")
+    # ...
+
+    return respondents
 
 
 def create_connection_db(connection_str: str):
