@@ -34,10 +34,10 @@ class Respondent(object):
         self._matching_ids = matching_ids
 
     def __hash__(self) -> int:
-        return hash(self.openmedia_id)
+        return hash(self._openmedia_id)
 
     def __eq__(self, that) -> bool:
-        return self.openmedia_id == that.openmedia_id
+        return self._openmedia_id == that._openmedia_id
 
     def asdict(self):
         return {
