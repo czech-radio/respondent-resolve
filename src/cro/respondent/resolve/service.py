@@ -36,6 +36,16 @@ __all__ = tuple(
 respondents = []
 persons = []
 
+# ... meh
+def fix_utf(input: str) -> str:
+    return str(input.replace("\u0161",'š')
+            .replace("\u010c",'Č')
+            .replace("\u00ed",'í')
+            .replace("\u016f",'ů')
+            .replace("\u016f",'ů')
+            .replace("\u011b",'ě')
+            )
+
 
 def extract_respodents_from_df(dataframe: pd.DataFrame) -> List[Respondent]:
 
@@ -47,7 +57,7 @@ def extract_respodents_from_df(dataframe: pd.DataFrame) -> List[Respondent]:
                 respondents.append(
                     Respondent(
                         openmedia_id=line[20],
-                        given_name=line[19],
+                        given_name=fix_utf(line[19]),
                         family_name=line[22],
                         labels=line[23],
                         gender=line[24],

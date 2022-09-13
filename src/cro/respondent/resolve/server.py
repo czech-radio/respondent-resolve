@@ -34,7 +34,7 @@ def get_respondents(year: int, week: int):
     for respondent in respondents:
         output.append(respondent.asdict())
 
-    return output
+    return jsonify(output)
 
 
 @server.route("/persons", methods=["GET"])
