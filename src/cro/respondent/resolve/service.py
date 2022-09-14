@@ -125,11 +125,15 @@ def compare_persons_to_respondents(
 
     # persons_df = normalize_persons(persons_df)
 
-    resolved = []
+    count = 0
     for item in respondents:
-        resolved.append(match_persons(respondent=item, persons=persons_df))
+        resolved_df = match_persons(respondent=item, persons=persons_df)
+        if resolved_df is not None:
+            for x in resolved_df:
+                item.add_matching_id(x.uuid)
+                count = count + 1
 
-    return resolved
+    print(f"Found {count} matches.")
 
 
 # paste from cro-respodent-match

@@ -100,5 +100,8 @@ class Respondent(object):
     def matching_ids(self) -> List[str]:
         return self._matching_ids
 
+    def add_matching_id(self, matching_id: str):
+        self._matching_ids.append(matching_id)
+
 
 Person = Respondent
