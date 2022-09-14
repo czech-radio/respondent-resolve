@@ -217,7 +217,7 @@ def compare_persons_to_respondents(
                 and respondent.family_name == person.family_name
                 and respondent.affiliation == person.affiliation
             ):
-                respondent.add_matching_id(respondent.openmedia_id)
+                respondent.add_matching_id(person.openmedia_id)
                 count = count + 1
     print(f"Found {count} matches.")
 
