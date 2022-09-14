@@ -62,7 +62,7 @@ def extract_respodents_from_df(dataframe: pd.DataFrame) -> List[Respondent]:
     return respondents_tmp
 
 
-def exctract_persons_from_df(persons: pd.DataFrame) -> List[Person]:
+def extract_persons_from_df(persons: pd.DataFrame) -> List[Person]:
 
     output = []
 
@@ -157,7 +157,7 @@ def load_persons(connection) -> List[Person]:
         # normalized = normalize_persons(persons_tmp)
         # print(normalized)
 
-        return exctract_persons_from_df(persons=persons_tmp)
+        return extract_persons_from_df(persons=persons_tmp)
 
     except Exception as ex:
         logger.error(ex)
