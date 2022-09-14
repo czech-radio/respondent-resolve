@@ -187,18 +187,18 @@ def compare_persons_to_respondents(
 ):
 
     # convert lists to dataframes
-    respondents_df = pd.DataFrame([x.asdict() for x in respondents])
-    persons_df = pd.DataFrame([x.asdict() for x in persons])
+    # respondents_df = pd.DataFrame([x.asdict() for x in respondents])
+    # persons_df = pd.DataFrame([x.asdict() for x in persons])
 
     # normalize both data
-    respondents_df = normalize_persons(respondents_df)
-    persons_df = normalize_persons(persons_df)
+    # respondents_df = normalize_persons(respondents_df)
+    # persons_df = normalize_persons(persons_df)
 
     # compare dataframes
-    modified = identify_respondents(
-        respondents=respondents_df, known_persons=persons_df
-    )
-    return modified
+    # modified = identify_respondents(
+    #    respondents=respondents_df, known_persons=persons_df
+    # )
+    # return modified
 
     # variant 1 use match_function
     # for item in respondents:
@@ -209,14 +209,17 @@ def compare_persons_to_respondents(
     #            count = count + 1
 
     # variant 2 compare lists directly
-    # for respondent in respondents:
-    #    for person in persons:
-    #        if(respondent.given_name==person.given_name &&
-    #                respondent.family_name==person.family_name &&
-    #                respondent.affiliation==person.affiliation
-    #                ):
-    #            respondent.add_matching_id(respondent.uuid)
-    # print(f"Found {count} matches.")
+    count = 0
+    for respondent in respondents:
+        for person in persons:
+            if (
+                respondent.given_name == person.given_name
+                and respondent.family_name == person.family_name
+                and respondent.affiliation == person.affiliation
+            ):
+                respondent.add_matching_id(respondent.openmedia_id)
+                count = count + 1
+    print(f"Found {count} matches.")
 
 
 # paste from cro-respodent-match

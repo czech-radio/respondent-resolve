@@ -54,8 +54,12 @@ def get_persons():
 # for testing purposes only
 @server.route("/test_resolve", methods=["GET"])
 def refresh():
-    get_respondents(2022, 36)
-    get_persons()
+    con = create_connection_db(
+        f"dbname={AURA_TARGET_NAME} user={AURA_TARGET_USER} host={AURA_TARGET_HOST} port={AURA_TARGET_PORT} password={AURA_TARGET_PASS}"
+    )
+    persons = load_persons(con)
+    respondents = load_respondents(year=2022, week_number=36)
+
     return jsonify(
         compare_persons_to_respondents(persons=persons, respondents=respondents)
     )
