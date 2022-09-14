@@ -3,8 +3,6 @@
 import sys
 import datetime as dt
 
-import chardet
-
 from typing import List, Set
 import pandas as pd
 import pandas.io.sql as sqlio
@@ -36,15 +34,20 @@ __all__ = tuple(
 respondents = []
 persons = []
 
-# ... meh
-def fix_utf(input: str) -> str:
-    return str(input.replace("\u0161",'š')
-            .replace("\u010c",'Č')
-            .replace("\u00ed",'í')
-            .replace("\u016f",'ů')
-            .replace("\u016f",'ů')
-            .replace("\u011b",'ě')
-            )
+# ... meh, this is really mess
+def fix_utf(input_text: str):
+
+    print(input_text)
+    return input_text.encode("utf-8").decode("unicode_escape")
+    # return input_text.encode("windows-1250",'backslashreplace').decode('utf-8','backslashreplace')
+    # return input_text.replace('\\','\\\\').encode("unicode_escape").decode("unicode_escape")
+    # return input_text.decode('unicode_escape')
+    # .replace("\u0161",'š')
+    # .replace("\u010c",'Č')
+    # .replace("\u00ed",'í')
+    # .replace("\u016f",'ů')
+    # .replace("\u016f",'ů')
+    # .replace("\u011b",'ě')
 
 
 def extract_respodents_from_df(dataframe: pd.DataFrame) -> List[Respondent]:
@@ -57,7 +60,7 @@ def extract_respodents_from_df(dataframe: pd.DataFrame) -> List[Respondent]:
                 respondents.append(
                     Respondent(
                         openmedia_id=line[20],
-                        given_name=fix_utf(line[19]),
+                        given_name=line[19],
                         family_name=line[22],
                         labels=line[23],
                         gender=line[24],
@@ -118,7 +121,15 @@ def load_persons(connection) -> List[Person]:
 def compare_persons_to_respondents(
     respondents: List[Respondent], persons: List[Person]
 ):
-    ...
+    persons_df = pd.DataFrame([x.asdict() for x in persons])
+
+    # persons_df = normalize_persons(persons_df)
+
+    resolved = []
+    for item in respondents:
+        resolved.append(match_persons(respondent=item, persons=persons_df))
+
+    return resolved
 
 
 # paste from cro-respodent-match
@@ -138,6 +149,9 @@ def normalize_persons(persons: pd.DataFrame) -> pd.DataFrame:
             foreigner: Integer, dtype: int (0, 1, 2)
     :return: The normalized copy of original person data.
     """
+
+    # df = pd.DataFrame([x.asdict() for x in persons])
+
     # Get only subset of columns.
     df = persons[
         [

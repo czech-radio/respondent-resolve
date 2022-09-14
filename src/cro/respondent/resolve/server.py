@@ -45,6 +45,13 @@ def get_persons():
     return load_persons(con)
 
 
+@server.route("/resolved", methods=["GET"])
+def resolved():
+    return jsonify(
+        compare_persons_to_respondents(persons=persons, respondents=respondents)
+    )
+
+
 def create_app() -> Flask:
     return server
 
