@@ -48,12 +48,11 @@ def get_persons():
 # for testing purposes only
 @server.route("/test_resolve", methods=["GET"])
 def refresh():
-    get_respondents(2022,36)
+    get_respondents(2022, 36)
     get_persons()
     return jsonify(
         compare_persons_to_respondents(persons=persons, respondents=respondents)
-        )
-
+    )
 
 
 @server.route("/resolved", methods=["GET"])
@@ -73,6 +72,6 @@ def main():
     """
     server = create_app()
     # do not convert json to ascii
-    server.config['JSON_AS_ASCII'] = False
+    server.config["JSON_AS_ASCII"] = False
 
     server.run(debug=True)

@@ -108,6 +108,7 @@ def create_connection_db(connection_str: str):
     with db.connect(connection_str) as connection:
         return connection
 
+
 # ioutputs list of reposndent
 def load_persons(connection) -> List[Person]:
     try:
@@ -123,6 +124,7 @@ def load_persons(connection) -> List[Person]:
     except Exception as ex:
         logger.error(ex)
         raise ex
+
 
 # outputs pandas dataframe
 def fetch_persons(connection) -> pd.DataFrame:
@@ -141,25 +143,26 @@ def fetch_persons(connection) -> pd.DataFrame:
         raise ex
 
 
-
 def compare_persons_to_respondents(
     respondents: List[Respondent], persons: List[Person]
-): 
-    
+):
+
     # convert lists to dataframes
     respondents_df = pd.DataFrame([x.asdict() for x in respondents])
     persons_df = pd.DataFrame([x.asdict() for x in persons])
-    
+
     # normalize both data
     respondents_df = normalize_persons(respondents_df)
     persons_df = normalize_persons(persons_df)
 
     # compare dataframes
-    modified = identify_respondents(respondents=respondents_df,known_persons=persons_df)
+    modified = identify_respondents(
+        respondents=respondents_df, known_persons=persons_df
+    )
     return modified
 
     # variant 1 use match_function
-    #for item in respondents:
+    # for item in respondents:
     #    resolved_df = match_persons(respondent=item, persons=persons_df)
     #    if(resolved_df is not None):
     #        for x in resolved_df:
@@ -167,7 +170,7 @@ def compare_persons_to_respondents(
     #            count = count + 1
 
     # variant 2 compare lists directly
-    #for respondent in respondents:
+    # for respondent in respondents:
     #    for person in persons:
     #        if(respondent.given_name==person.given_name &&
     #                respondent.family_name==person.family_name &&
@@ -311,7 +314,7 @@ def identify_respondents(respondents: pd.DataFrame, known_persons):
             labels=candidate.labels,
             gender=candidate.gender,
             foreigner=candidate.foreigner,
-            matching_ids=[""]
+            matching_ids=[""],
         )
         found = match_persons(respondent, known_persons, match_labels=True)
 
