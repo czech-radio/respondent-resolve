@@ -42,7 +42,13 @@ def get_persons():
     con = create_connection_db(
         f"dbname={AURA_TARGET_NAME} user={AURA_TARGET_USER} host={AURA_TARGET_HOST} port={AURA_TARGET_PORT} password={AURA_TARGET_PASS}"
     )
-    return load_persons(con)
+    persons = load_persons(con)
+
+    output = []
+    for person in persons:
+        output.append(person.asdict())
+
+    return jsonify(output)
 
 
 # for testing purposes only
@@ -71,7 +77,9 @@ def main():
     The main application function.
     """
     server = create_app()
-    # do not convert json to ascii
+
+    # config Server app
     server.config["JSON_AS_ASCII"] = False
+    server.config["JSON_SORT_KEYS"] = False
 
     server.run(debug=True)

@@ -39,10 +39,12 @@ def extract_respodents_from_df(dataframe: pd.DataFrame) -> List[Respondent]:
 
     respondents_raw = dataframe.values.tolist()
 
+    respondents_tmp = []
+
     for line in respondents_raw:
         if line[0] == "contact":
             try:
-                respondents.append(
+                respondents_tmp.append(
                     Respondent(
                         openmedia_id=line[20],
                         given_name=line[19],
@@ -57,7 +59,41 @@ def extract_respodents_from_df(dataframe: pd.DataFrame) -> List[Respondent]:
             except TypeError:
                 print(f"Error parsing contact {line[0]}")
 
-    return respondents_raw
+    return respondents_tmp
+
+
+def exctract_persons_from_df(persons: pd.DataFrame) -> List[Person]:
+
+    output = []
+
+    # Get only subset of columns.
+    df = persons[
+        [
+            "unique_id",
+            "given_name",
+            "family_name",
+            "affiliation",
+            "gender",
+            "labels",
+            "foreigner",
+        ]
+    ].copy()
+
+    for i, person in df.iterrows():
+        output.append(
+            Respondent(
+                openmedia_id=person.unique_id,
+                given_name=person.given_name,
+                family_name=person.family_name,
+                affiliation=person.affiliation,
+                labels=person.labels,
+                gender=person.gender,
+                foreigner=person.foreigner,
+                matching_ids=[""],
+            )
+        )
+
+    return output
 
 
 # def load_respondents_to_df(year: int, week_number: int) -> pd.DataFrame:
@@ -97,10 +133,10 @@ def load_respondents(year: int, week_number: int) -> List[Respondent]:
         engine="openpyxl",
     )
 
-    respondents = extract_respodents_from_df(df)
+    respondents_tmp = extract_respodents_from_df(df)
     print(f"Loaded {len(df)} respondents.")
 
-    return respondents
+    return respondents_tmp
 
 
 def create_connection_db(connection_str: str):
@@ -112,13 +148,16 @@ def create_connection_db(connection_str: str):
 def load_persons(connection) -> List[Person]:
     try:
         logger.info("Loading respondent database started")
-        persons = sqlio.read_sql_query(
+        persons_tmp = sqlio.read_sql_query(
             f"select * from get_persons(some_date => '{dt.datetime.today().strftime('%Y-%m-%d')}')",
             connection,
         )
         logger.info("Fetch respondents finished")
 
-        return persons.values.tolist()
+        # normalized = normalize_persons(persons_tmp)
+        # print(normalized)
+
+        return exctract_persons_from_df(persons=persons_tmp)
 
     except Exception as ex:
         logger.error(ex)
@@ -203,14 +242,13 @@ def normalize_persons(persons: pd.DataFrame) -> pd.DataFrame:
     # Get only subset of columns.
     df = persons[
         [
-            "openmedia_id",
+            "unique_id",
             "given_name",
             "family_name",
             "affiliation",
             "gender",
             "labels",
             "foreigner",
-            "matching_ids",
         ]
     ].copy()
 
@@ -239,8 +277,8 @@ def normalize_persons(persons: pd.DataFrame) -> pd.DataFrame:
         .apply(set)
     )
 
-    df.openmedia_id = df.openmedia_id.astype(str)
-    df.openmedia_id = df.openmedia_id.str.strip()
+    df.unique_id = df.unique_id.astype(str)
+    df.unique_id = df.unique_id.str.strip()
 
     df.gender = df.gender.astype(str)
     df.gender = df.gender.str.replace("1", "male")
