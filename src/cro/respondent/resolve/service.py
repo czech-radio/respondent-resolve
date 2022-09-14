@@ -60,26 +60,28 @@ def extract_respodents_from_df(dataframe: pd.DataFrame) -> List[Respondent]:
     return respondents_raw
 
 
-def fetch_respondents(year: int, week_number: int) -> pd.DataFrame:
-
-    working_directory = f"/mnt/R/GŘ/Strategický rozvoj/Kancelář/Analytics/Source/{year}"
-    PATH = Path(working_directory)
-    FULL_PATH = PATH / f"DATA_{year}W{week_number}_TEST.xlsx"
-
-    df = pd.read_excel(
-        FULL_PATH,
-        sheet_name=0,
-        header=None,
-        engine="openpyxl",
-    )
-
-    df = normalize_persons(df)
-    print(f"Loaded {len(df)} respondents.")
-
-    # print(f"Normalizing dataframe")
-    # ...
-
-    return respondents
+#def load_respondents_to_df(year: int, week_number: int) -> pd.DataFrame:
+#
+#    working_directory = f"/mnt/R/GŘ/Strategický rozvoj/Kancelář/Analytics/Source/{year}"
+#    PATH = Path(working_directory)
+#    FULL_PATH = PATH / f"DATA_{year}W{week_number}_TEST.xlsx"
+#
+#    df = pd.read_excel(
+#        FULL_PATH,
+#        sheet_name=0,
+#        header=None,
+#        engine="openpyxl",
+#    )
+#
+#    print(f"Loaded {len(df)} respondents.")
+#    
+#    try:
+#        print(f"Normalizing dataframe")
+#        df = normalize_persons(df)
+#    except Exception:
+#        print(f"Error normalizing persons")
+#
+#    return df
 
 
 def load_respondents(year: int, week_number: int) -> List[Respondent]:
@@ -95,11 +97,8 @@ def load_respondents(year: int, week_number: int) -> List[Respondent]:
         engine="openpyxl",
     )
 
-    df = extract_respodents_from_df(df)
+    respondents = extract_respodents_from_df(df)
     print(f"Loaded {len(df)} respondents.")
-
-    # print(f"Normalizing dataframe")
-    # ...
 
     return respondents
 
@@ -109,7 +108,7 @@ def create_connection_db(connection_str: str):
         return connection
 
 
-# ioutputs list of reposndent
+# outputs list of reposndent
 def load_persons(connection) -> List[Person]:
     try:
         logger.info("Loading respondent database started")
@@ -127,21 +126,21 @@ def load_persons(connection) -> List[Person]:
 
 
 # outputs pandas dataframe
-def fetch_persons(connection) -> pd.DataFrame:
-    try:
-        logger.info("Loading respondent database started")
-        persons = sqlio.read_sql_query(
-            f"select * from get_persons(some_date => '{dt.datetime.today().strftime('%Y-%m-%d')}')",
-            connection,
-        )
-        logger.info("Fetch respondents finished")
-
-        return persons
-
-    except Exception as ex:
-        logger.error(ex)
-        raise ex
-
+#def fetch_persons(connection) -> pd.DataFrame:
+#    try:
+#        logger.info("Loading respondent database started")
+#        persons = sqlio.read_sql_query(
+#            f"select * from get_persons(some_date => '{dt.datetime.today().strftime('%Y-%m-%d')}')",
+#            connection,
+#        )
+#        logger.info("Fetch respondents finished")
+#
+#        return persons
+#
+#    except Exception as ex:
+#        logger.error(ex)
+#        raise ex
+#
 
 def compare_persons_to_respondents(
     respondents: List[Respondent], persons: List[Person]
