@@ -123,7 +123,7 @@ def compare_persons_to_respondents(
 ):
     persons_df = pd.DataFrame([x.asdict() for x in persons])
 
-    # persons_df = normalize_persons(persons_df)
+    # variant 1 use match_function
 
     count = 0
     for item in respondents:
@@ -132,6 +132,15 @@ def compare_persons_to_respondents(
             for x in resolved_df:
                 item.add_matching_id(x.uuid)
                 count = count + 1
+
+    # variant 2 compare lists directly
+    # for respondent in respondents:
+    #    for person in persons:
+    #        if(respondent.given_name==person.given_name &&
+    #                respondent.family_name==person.family_name &&
+    #                respondent.affiliation==person.affiliation
+    #                ):
+    #            respondent.add_matching_id(respondent.uuid)
 
     print(f"Found {count} matches.")
 
