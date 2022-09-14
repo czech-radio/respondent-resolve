@@ -57,18 +57,22 @@ def refresh():
     con = create_connection_db(
         f"dbname={AURA_TARGET_NAME} user={AURA_TARGET_USER} host={AURA_TARGET_HOST} port={AURA_TARGET_PORT} password={AURA_TARGET_PASS}"
     )
-    persons = load_persons(con)
     respondents = load_respondents(year=2022, week_number=36)
+    persons = load_persons(con)
 
-    return jsonify(
-        compare_persons_to_respondents(persons=persons, respondents=respondents)
-    )
+    results = compare_respondents_to_persons(respondents=respondents, persons=persons)
+
+    output = []
+    for result in results:
+        output.append(result.asdict())
+
+    return jsonify(output)
 
 
 @server.route("/resolved", methods=["GET"])
 def resolved():
     return jsonify(
-        compare_persons_to_respondents(persons=persons, respondents=respondents)
+        compare_respondents_to_persons(respondents=respondents, persons=persons)
     )
 
 

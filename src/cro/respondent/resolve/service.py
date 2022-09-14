@@ -23,7 +23,7 @@ __all__ = tuple(
         "load_persons",
         "create_connection_db",
         "extract_respodents_from_df",
-        "compare_persons_to_respondents",
+        "compare_respondents_to_persons",
         "respondents",
         "persons",
     ]
@@ -182,9 +182,9 @@ def load_persons(connection) -> List[Person]:
 #
 
 
-def compare_persons_to_respondents(
+def compare_respondents_to_persons(
     respondents: List[Respondent], persons: List[Person]
-):
+) -> List[Respondent]:
 
     # convert lists to dataframes
     # respondents_df = pd.DataFrame([x.asdict() for x in respondents])
@@ -208,6 +208,8 @@ def compare_persons_to_respondents(
     #            item.add_matching_id(x.uuid)
     #            count = count + 1
 
+    output = []
+
     # variant 2 compare lists directly
     count = 0
     for respondent in respondents:
@@ -218,6 +220,7 @@ def compare_persons_to_respondents(
                 and respondent.affiliation == person.affiliation
             ):
                 respondent.add_matching_id(person.openmedia_id)
+                output.append(respondent)
                 count = count + 1
 
     print(f"Found: {count} matches.")
@@ -231,9 +234,12 @@ def compare_persons_to_respondents(
                     and respondent.family_name == person.family_name
                 ):
                     respondent.add_matching_id(person.openmedia_id)
+                    output.append(respondent)
                     count = count + 1
 
-    print(f"retying name only match... found: {count} matches.")
+        print(f"Retrying name-only match... found: {count} matches.")
+
+    return output
 
 
 # paste from cro-respodent-match
