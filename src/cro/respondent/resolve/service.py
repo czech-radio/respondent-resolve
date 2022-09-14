@@ -60,7 +60,7 @@ def extract_respodents_from_df(dataframe: pd.DataFrame) -> List[Respondent]:
     return respondents_raw
 
 
-#def load_respondents_to_df(year: int, week_number: int) -> pd.DataFrame:
+# def load_respondents_to_df(year: int, week_number: int) -> pd.DataFrame:
 #
 #    working_directory = f"/mnt/R/GŘ/Strategický rozvoj/Kancelář/Analytics/Source/{year}"
 #    PATH = Path(working_directory)
@@ -74,7 +74,7 @@ def extract_respodents_from_df(dataframe: pd.DataFrame) -> List[Respondent]:
 #    )
 #
 #    print(f"Loaded {len(df)} respondents.")
-#    
+#
 #    try:
 #        print(f"Normalizing dataframe")
 #        df = normalize_persons(df)
@@ -126,7 +126,7 @@ def load_persons(connection) -> List[Person]:
 
 
 # outputs pandas dataframe
-#def fetch_persons(connection) -> pd.DataFrame:
+# def fetch_persons(connection) -> pd.DataFrame:
 #    try:
 #        logger.info("Loading respondent database started")
 #        persons = sqlio.read_sql_query(
@@ -141,6 +141,7 @@ def load_persons(connection) -> List[Person]:
 #        logger.error(ex)
 #        raise ex
 #
+
 
 def compare_persons_to_respondents(
     respondents: List[Respondent], persons: List[Person]
