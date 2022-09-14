@@ -34,21 +34,6 @@ __all__ = tuple(
 respondents = []
 persons = []
 
-# ... meh, this is really mess
-def fix_utf(input_text: str):
-
-    print(input_text)
-    return input_text.encode("utf-8").decode("unicode_escape")
-    # return input_text.encode("windows-1250",'backslashreplace').decode('utf-8','backslashreplace')
-    # return input_text.replace('\\','\\\\').encode("unicode_escape").decode("unicode_escape")
-    # return input_text.decode('unicode_escape')
-    # .replace("\u0161",'š')
-    # .replace("\u010c",'Č')
-    # .replace("\u00ed",'í')
-    # .replace("\u016f",'ů')
-    # .replace("\u016f",'ů')
-    # .replace("\u011b",'ě')
-
 
 def extract_respodents_from_df(dataframe: pd.DataFrame) -> List[Respondent]:
 
@@ -73,6 +58,28 @@ def extract_respodents_from_df(dataframe: pd.DataFrame) -> List[Respondent]:
                 print(f"Error parsing contact {line[0]}")
 
     return respondents_raw
+
+
+def fetch_respondents(year: int, week_number: int) -> pd.DataFrame:
+
+    working_directory = f"/mnt/R/GŘ/Strategický rozvoj/Kancelář/Analytics/Source/{year}"
+    PATH = Path(working_directory)
+    FULL_PATH = PATH / f"DATA_{year}W{week_number}_TEST.xlsx"
+
+    df = pd.read_excel(
+        FULL_PATH,
+        sheet_name=0,
+        header=None,
+        engine="openpyxl",
+    )
+
+    df = normalize_persons(df)
+    print(f"Loaded {len(df)} respondents.")
+
+    # print(f"Normalizing dataframe")
+    # ...
+
+    return respondents
 
 
 def load_respondents(year: int, week_number: int) -> List[Respondent]:
@@ -101,7 +108,7 @@ def create_connection_db(connection_str: str):
     with db.connect(connection_str) as connection:
         return connection
 
-
+# ioutputs list of reposndent
 def load_persons(connection) -> List[Person]:
     try:
         logger.info("Loading respondent database started")
@@ -117,32 +124,57 @@ def load_persons(connection) -> List[Person]:
         logger.error(ex)
         raise ex
 
+# outputs pandas dataframe
+def fetch_persons(connection) -> pd.DataFrame:
+    try:
+        logger.info("Loading respondent database started")
+        persons = sqlio.read_sql_query(
+            f"select * from get_persons(some_date => '{dt.datetime.today().strftime('%Y-%m-%d')}')",
+            connection,
+        )
+        logger.info("Fetch respondents finished")
+
+        return persons
+
+    except Exception as ex:
+        logger.error(ex)
+        raise ex
+
+
 
 def compare_persons_to_respondents(
     respondents: List[Respondent], persons: List[Person]
-):
+): 
+    
+    # convert lists to dataframes
+    respondents_df = pd.DataFrame([x.asdict() for x in respondents])
     persons_df = pd.DataFrame([x.asdict() for x in persons])
+    
+    # normalize both data
+    respondents_df = normalize_persons(respondents_df)
+    persons_df = normalize_persons(persons_df)
+
+    # compare dataframes
+    modified = identify_respondents(respondents=respondents_df,known_persons=persons_df)
+    return modified
 
     # variant 1 use match_function
-
-    count = 0
-    for item in respondents:
-        resolved_df = match_persons(respondent=item, persons=persons_df)
-        if resolved_df is not None:
-            for x in resolved_df:
-                item.add_matching_id(x.uuid)
-                count = count + 1
+    #for item in respondents:
+    #    resolved_df = match_persons(respondent=item, persons=persons_df)
+    #    if(resolved_df is not None):
+    #        for x in resolved_df:
+    #            item.add_matching_id(x.uuid)
+    #            count = count + 1
 
     # variant 2 compare lists directly
-    # for respondent in respondents:
+    #for respondent in respondents:
     #    for person in persons:
     #        if(respondent.given_name==person.given_name &&
     #                respondent.family_name==person.family_name &&
     #                respondent.affiliation==person.affiliation
     #                ):
     #            respondent.add_matching_id(respondent.uuid)
-
-    print(f"Found {count} matches.")
+    # print(f"Found {count} matches.")
 
 
 # paste from cro-respodent-match
@@ -153,7 +185,7 @@ def normalize_persons(persons: pd.DataFrame) -> pd.DataFrame:
     Normalize the person data.
     :param persons: The input data with person data.
         Columns:
-            unique_id: UUID, dtype: str
+            openmedia_id: UUID, dtype: str
             given_name: String, dtype: str
             family_name: String, dtype: str
             affiliation: String, dtype: str
@@ -168,13 +200,14 @@ def normalize_persons(persons: pd.DataFrame) -> pd.DataFrame:
     # Get only subset of columns.
     df = persons[
         [
-            "unique_id",
+            "openmedia_id",
             "given_name",
             "family_name",
             "affiliation",
             "gender",
             "labels",
             "foreigner",
+            "matching_ids",
         ]
     ].copy()
 
@@ -203,8 +236,8 @@ def normalize_persons(persons: pd.DataFrame) -> pd.DataFrame:
         .apply(set)
     )
 
-    df.unique_id = df.unique_id.astype(str)
-    df.unique_id = df.unique_id.str.strip()
+    df.openmedia_id = df.openmedia_id.astype(str)
+    df.openmedia_id = df.openmedia_id.str.strip()
 
     df.gender = df.gender.astype(str)
     df.gender = df.gender.str.replace("1", "male")
@@ -276,6 +309,9 @@ def identify_respondents(respondents: pd.DataFrame, known_persons):
             family_name=candidate.family_name,
             affiliation=candidate.affiliation,
             labels=candidate.labels,
+            gender=candidate.gender,
+            foreigner=candidate.foreigner,
+            matching_ids=[""]
         )
         found = match_persons(respondent, known_persons, match_labels=True)
 
@@ -283,7 +319,7 @@ def identify_respondents(respondents: pd.DataFrame, known_persons):
             identified += 1
         index += 1
 
-        person_ids = found.unique_id.to_list() if len(found) else ["None"]
+        person_ids = found.openmedia_id.to_list() if len(found) else ["None"]
         person_ids = ";".join(person_ids)
         candidates_final.append(person_ids)
 
