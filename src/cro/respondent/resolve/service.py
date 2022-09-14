@@ -46,8 +46,8 @@ def extract_respodents_from_df(dataframe: pd.DataFrame) -> List[Respondent]:
             try:
                 respondents_tmp.append(
                     Respondent(
-                        openmedia_id=line[20],
-                        given_name=line[19],
+                        openmedia_id=line[20].lower(),
+                        given_name=line[19].split()[1],
                         family_name=line[22],
                         labels=line[23],
                         gender=line[24],
@@ -56,7 +56,7 @@ def extract_respodents_from_df(dataframe: pd.DataFrame) -> List[Respondent]:
                         matching_ids=[""],
                     )
                 )
-            except TypeError:
+            except:
                 print(f"Error parsing contact {line[0]}")
 
     return respondents_tmp
@@ -219,7 +219,21 @@ def compare_persons_to_respondents(
             ):
                 respondent.add_matching_id(person.openmedia_id)
                 count = count + 1
-    print(f"Found {count} matches.")
+
+    print(f"Found: {count} matches.")
+
+    # if none found try name only match
+    if count == 0:
+        for respondent in respondents:
+            for person in persons:
+                if (
+                    respondent.given_name == person.given_name
+                    and respondent.family_name == person.family_name
+                ):
+                    respondent.add_matching_id(person.openmedia_id)
+                    count = count + 1
+
+    print(f"retying name only match... found: {count} matches.")
 
 
 # paste from cro-respodent-match
