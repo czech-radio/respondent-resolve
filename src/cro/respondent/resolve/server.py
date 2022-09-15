@@ -51,20 +51,22 @@ def get_persons():
     return jsonify(output)
 
 
-# for testing purposes only
-@server.route("/test_resolve", methods=["GET"])
-def refresh():
+@server.route("/resolved/<year>/<week>", methods=["GET"])
+def resolved_year_week(year: int, week: int):
     con = create_connection_db(
         f"dbname={AURA_TARGET_NAME} user={AURA_TARGET_USER} host={AURA_TARGET_HOST} port={AURA_TARGET_PORT} password={AURA_TARGET_PASS}"
     )
-    respondents = load_respondents(year=2022, week_number=36)
-    persons = load_persons(con)
+    _respondents = load_respondents(year=year, week_number=week)
+    _persons = load_persons(con)
 
-    results = compare_respondents_to_persons(respondents=respondents, persons=persons)
+    results = compare_respondents_to_persons(respondents=_respondents, persons=_persons)
 
     output = []
     for result in results:
         output.append(result.asdict())
+
+    # print(output)
+    # result ok
 
     return jsonify(output)
 
