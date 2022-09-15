@@ -182,6 +182,23 @@ def load_persons(connection) -> List[Person]:
 #
 
 
+def compare_name_to_persons(
+    family_name: str, given_name: str, input_persons: List[Person]
+) -> List[Respondent]:
+    output = []
+
+    for person in input_persons:
+        if given_name == person.given_name and family_name == person.family_name:
+            output.append(person)
+
+    return output
+
+
+# TODO:
+# compare and marge labels
+# faster first run matching uuid only
+
+
 def compare_respondents_to_persons(
     respondents: List[Respondent], persons: List[Person]
 ) -> List[Respondent]:
