@@ -75,7 +75,9 @@ def get_person_tmp():
         persons_tmp = get_person_by_uuid(uuid=uuid.format(), input_persons=persons)
     elif given_name is not None and family_name is not None:
         persons_tmp = get_person_by_full_name(
-            family_name=family_name, given_name=given_name, input_persons=persons
+            family_name=family_name,
+            given_name=given_name.format(),
+            input_persons=persons,
         )
     elif family_name is not None:
         persons_tmp = get_person_by_family_name(
