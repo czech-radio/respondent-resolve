@@ -20,6 +20,9 @@ AURA_TARGET_PASS = os.environ["AURA_TARGET_PASS"]
 
 
 server = Flask(__name__)
+# glob vars here
+persons = []
+respondents = []
 
 
 @server.route("/", methods=["GET"])
@@ -54,15 +57,18 @@ def get_persons():
 
 @server.route("/resolved/detail", methods=["GET"])
 def get_person_tmp():
-    if not persons:
-        con = create_connection_db(
-            f"dbname={AURA_TARGET_NAME} user={AURA_TARGET_USER} host={AURA_TARGET_HOST} port={AURA_TARGET_PORT} password={AURA_TARGET_PASS}"
-        )
-        persons = load_persons(con)
+    # if not persons:
+    #    con = create_connection_db(
+    #        f"dbname={AURA_TARGET_NAME} user={AURA_TARGET_USER} host={AURA_TARGET_HOST} port={AURA_TARGET_PORT} password={AURA_TARGET_PASS}"
+    #    )
+    #    persons = load_persons(con)
 
-    uuid = f"{request.args.get('uuid')}"
-    family_name = f"{request.args.get('family_name')}"
-    given_name = f"{request.args.get('given_name')}"
+    print(request.args.to_dict())
+    uuid = request.args.get("uuid")  # .format()
+    family_name = request.args.get("family_name")  # .format()
+    given_name = request.args.get("given_name")  # .format()
+
+    persons_tmp = []
 
     if uuid is not None:
         persons_tmp = get_person_by_uuid(uuid=uuid, input_persons=persons)
@@ -71,7 +77,8 @@ def get_person_tmp():
             family_name=family_name, given_name=given_name, input_persons=persons
         )
     elif family_name is not None:
-        persons_tmp = get_person_by_family_name(family_name, persons)
+        persons_tmp = get_person_by_family_name(family_name, input_persons=persons)
+        print(f"Searching {family_name}")
     else:
         ...
         # abort(500, "Necesarry arguments were not supplied")
@@ -81,6 +88,7 @@ def get_person_tmp():
         # abort(400, "Record were not found")
 
     output = []
+
     for person in persons_tmp:
         output.append(person.asdict())
 
