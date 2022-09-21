@@ -27,15 +27,15 @@ __all__ = tuple(
         "get_person_by_uuid",
         "get_person_by_family_name",
         "get_person_by_full_name",
-        #        "respondents",
-        #        "persons",
+        "respondents",
+        "persons",
     ]
 )
 
 
 # glob memory storage init
-# respondents = []
-# persons = []
+respondents = []
+persons = []
 
 
 def extract_respodents_from_df(dataframe: pd.DataFrame) -> List[Respondent]:
