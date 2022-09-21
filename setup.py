@@ -31,6 +31,7 @@ setup(
         "loguru",
         "openpyxl",
         "unidecode",
+        "tasks",
     ],
     extras_require={"dev": TEST_DEPS + LINT_DEPS + DOCS_DEPS},
     entry_points={

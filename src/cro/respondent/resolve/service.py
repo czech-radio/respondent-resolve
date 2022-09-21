@@ -29,13 +29,15 @@ __all__ = tuple(
         "get_person_by_full_name",
         "respondents",
         "persons",
+        "resolved",
     ]
 )
 
 
 # glob memory storage init
-respondents = []
-persons = []
+respondents: List[Person] = []
+persons: List[Person] = []
+resolved: List[Person] = []
 
 
 def extract_respodents_from_df(dataframe: pd.DataFrame) -> List[Respondent]:
@@ -136,10 +138,10 @@ def load_respondents(year: int, week_number: int) -> List[Respondent]:
         engine="openpyxl",
     )
 
-    respondents_tmp = extract_respodents_from_df(df)
+    respondents = extract_respodents_from_df(df)
     print(f"Loaded {len(df)} respondents.")
 
-    return respondents_tmp
+    return respondents
 
 
 def create_connection_db(connection_str: str):

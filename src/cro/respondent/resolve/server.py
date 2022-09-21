@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-
+# from threading import Thread
 import pandas as pd
 import json
 import os
@@ -7,6 +7,8 @@ import os
 
 from flask import Flask, request, jsonify
 from werkzeug.serving import WSGIRequestHandler
+
+# from tasks import threaded_task
 
 from cro.respondent.resolve.domain import Respondent
 from cro.respondent.resolve.service import *
@@ -29,6 +31,7 @@ def get_version():
 
 @server.route("/respondents/<year>/<week>", methods=["GET"])
 def get_respondents(year: int, week: int):
+
     respondents = load_respondents(year=year, week_number=week)
 
     output = []
@@ -52,29 +55,32 @@ def get_persons():
     return jsonify(output)
 
 
-@server.route("/resolved/detail", methods=["GET"])
+@server.route("/persons/filter", methods=["GET"])
 def get_person_tmp():
-    # if not persons:
-    #    con = create_connection_db(
-    #        f"dbname={AURA_TARGET_NAME} user={AURA_TARGET_USER} host={AURA_TARGET_HOST} port={AURA_TARGET_PORT} password={AURA_TARGET_PASS}"
-    #    )
-    #    persons = load_persons(con)
+    con = create_connection_db(
+        f"dbname={AURA_TARGET_NAME} user={AURA_TARGET_USER} host={AURA_TARGET_HOST} port={AURA_TARGET_PORT} password={AURA_TARGET_PASS}"
+    )
+    persons = load_persons(con)
 
     print(request.args.to_dict())
     uuid = request.args.get("uuid")  # .format()
     family_name = request.args.get("family_name")  # .format()
     given_name = request.args.get("given_name")  # .format()
 
+    print(family_name)
+
     persons_tmp = []
 
     if uuid is not None:
-        persons_tmp = get_person_by_uuid(uuid=uuid, input_persons=persons)
+        persons_tmp = get_person_by_uuid(uuid=uuid.format(), input_persons=persons)
     elif given_name is not None and family_name is not None:
         persons_tmp = get_person_by_full_name(
             family_name=family_name, given_name=given_name, input_persons=persons
         )
     elif family_name is not None:
-        persons_tmp = get_person_by_family_name(family_name, input_persons=persons)
+        persons_tmp = get_person_by_family_name(
+            family_name.format(), input_persons=persons
+        )
     else:
         ...
         # abort(500, "Necesarry arguments were not supplied")
@@ -94,19 +100,19 @@ def get_person_tmp():
 @server.route("/resolved/<year>/<week>", methods=["GET"])
 def resolved_year_week(year: int, week: int):
 
-    # if not persons:
-    #    con = create_connection_db(
-    #        f"dbname={AURA_TARGET_NAME} user={AURA_TARGET_USER} host={AURA_TARGET_HOST} port={AURA_TARGET_PORT} password={AURA_TARGET_PASS}"
-    #    )
-    #    persons = load_persons(con)
+    con = create_connection_db(
+        f"dbname={AURA_TARGET_NAME} user={AURA_TARGET_USER} host={AURA_TARGET_HOST} port={AURA_TARGET_PORT} password={AURA_TARGET_PASS}"
+    )
 
-    # if not repondents:
-    #    respondents = load_respondents(year=year, week_number=week)
+    # new thread
+    persons = load_persons(con)
 
-    results = compare_respondents_to_persons(respondents=_respondents, persons=_persons)
+    respondents = load_respondents(year=year, week_number=week)
+
+    resolved = compare_respondents_to_persons(respondents=respondents, persons=persons)
 
     output = []
-    for result in results:
+    for result in resolved:
         output.append(result.asdict())
 
     print(output)
