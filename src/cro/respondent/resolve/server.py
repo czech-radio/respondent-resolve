@@ -6,6 +6,7 @@ import os
 
 
 from flask import Flask, request, jsonify
+from werkzeug.serving import WSGIRequestHandler
 
 from cro.respondent.resolve.domain import Respondent
 from cro.respondent.resolve.service import *
@@ -51,13 +52,52 @@ def get_persons():
     return jsonify(output)
 
 
+@server.route("/resolved/detail", methods=["GET"])
+def get_person_tmp():
+    if not persons:
+        con = create_connection_db(
+            f"dbname={AURA_TARGET_NAME} user={AURA_TARGET_USER} host={AURA_TARGET_HOST} port={AURA_TARGET_PORT} password={AURA_TARGET_PASS}"
+        )
+        persons = load_persons(con)
+
+    uuid = f"{request.args.get('uuid')}"
+    family_name = f"{request.args.get('family_name')}"
+    given_name = f"{request.args.get('given_name')}"
+
+    if uuid is not None:
+        persons_tmp = get_person_by_uuid(uuid=uuid, input_persons=persons)
+    elif given_name is not None and family_name is not None:
+        persons_tmp = get_person_by_full_name(
+            family_name=family_name, given_name=given_name, input_persons=persons
+        )
+    elif family_name is not None:
+        persons_tmp = get_person_by_family_name(family_name, persons)
+    else:
+        ...
+        # abort(500, "Necesarry arguments were not supplied")
+
+    if persons_tmp is None:
+        ...
+        # abort(400, "Record were not found")
+
+    output = []
+    for person in persons_tmp:
+        output.append(person.asdict())
+
+    return jsonify(output)
+
+
 @server.route("/resolved/<year>/<week>", methods=["GET"])
 def resolved_year_week(year: int, week: int):
-    con = create_connection_db(
-        f"dbname={AURA_TARGET_NAME} user={AURA_TARGET_USER} host={AURA_TARGET_HOST} port={AURA_TARGET_PORT} password={AURA_TARGET_PASS}"
-    )
-    _respondents = load_respondents(year=year, week_number=week)
-    _persons = load_persons(con)
+
+    if not persons:
+        con = create_connection_db(
+            f"dbname={AURA_TARGET_NAME} user={AURA_TARGET_USER} host={AURA_TARGET_HOST} port={AURA_TARGET_PORT} password={AURA_TARGET_PASS}"
+        )
+        persons = load_persons(con)
+
+    if not repondents:
+        respondents = load_respondents(year=year, week_number=week)
 
     results = compare_respondents_to_persons(respondents=_respondents, persons=_persons)
 
@@ -65,8 +105,8 @@ def resolved_year_week(year: int, week: int):
     for result in results:
         output.append(result.asdict())
 
-    # print(output)
-    # result ok
+    print(output)
+    # result ok here
 
     return jsonify(output)
 
@@ -91,5 +131,6 @@ def main():
     # config Server app
     server.config["JSON_AS_ASCII"] = False
     server.config["JSON_SORT_KEYS"] = False
+    WSGIRequestHandler.protocol_version = "HTTP/1.1"
 
     server.run(debug=True)

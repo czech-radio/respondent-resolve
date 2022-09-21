@@ -164,6 +164,43 @@ def load_persons(connection) -> List[Person]:
         raise ex
 
 
+def get_person_by_uuid(uuid: str, input_persons: List[Person]) -> List[Person]:
+
+    output = []
+
+    for person in input_persons:
+        if person.openmedia_id == uuid:
+            output.append(person)
+
+    return output
+
+
+def get_person_by_family_name(
+    family_name: str, input_persons: List[Person]
+) -> List[Person]:
+
+    output = []
+
+    for person in input_persons:
+        if person.family_name == family_name:
+            output.append(person)
+
+    return output
+
+
+def get_person_by_full_name(
+    given_name: str, family_name: str, input_persons: List[Person]
+) -> List[Person]:
+
+    output = []
+
+    for person in input_persons:
+        if person.given_name == family_name and person.given_name == given_name:
+            output.append(person)
+
+    return output
+
+
 # outputs pandas dataframe
 # def fetch_persons(connection) -> pd.DataFrame:
 #    try:
