@@ -48,6 +48,7 @@ df_resolved: DataFrame
 
 #########################################
 
+
 def extract_respodents_from_df(dataframe: pd.DataFrame) -> List[Respondent]:
 
     respondents_raw = dataframe.values.tolist()
@@ -170,7 +171,7 @@ def load_persons(connection) -> List[Person]:
 
         # normalized = normalize_persons(persons_tmp)
         # print(normalized)
-        
+
         df_persons = persons_tmp
 
         return extract_persons_from_df(persons=persons_tmp)
@@ -251,9 +252,10 @@ def compare_name_to_persons(
 # compare and marge labels
 # faster first run matching uuid only
 
+
 def list_to_dataframe(input_persons: List[Person]) -> DataFrame:
-    
-    #cols = [
+
+    # cols = [
     #        "unique_id",
     #        "given_name",
     #        "family_name",
@@ -262,9 +264,9 @@ def list_to_dataframe(input_persons: List[Person]) -> DataFrame:
     #        "labels",
     #        "foreigner",
     #    ]
-     
-    return DataFrame.from_records([p.to_dict() for p in input_persons])
 
+    # return DataFrame.from_records([p.asdict() for p in input_persons])
+    return DataFrame([p.asdict() for p in input_persons])
 
 
 def compare_respondents_to_persons(
@@ -330,7 +332,9 @@ def compare_respondents_to_persons(
     return output
 
 
+##############################################################################
 # paste from cro-respodent-match
+##############################################################################
 
 
 def normalize_persons(persons: pd.DataFrame) -> pd.DataFrame:
