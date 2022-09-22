@@ -7,10 +7,10 @@ from typing import List, Set
 import pandas as pd
 import pandas.io.sql as sqlio
 import psycopg2 as db
+
 from loguru import logger
+from pandas import DataFrame as DataFrame
 
-
-from pandas import DataFrame
 from cro.respondent.resolve.domain import Respondent, Person
 from timeit import default_timer
 from pathlib import Path
@@ -34,11 +34,19 @@ __all__ = tuple(
 )
 
 
+########################################
+
 # glob memory storage init
 respondents: List[Person] = []
 persons: List[Person] = []
 resolved: List[Person] = []
 
+# storage as dataframes
+df_respondets: DataFrame
+df_persons: DataFrame
+df_resolved: DataFrame
+
+#########################################
 
 def extract_respodents_from_df(dataframe: pd.DataFrame) -> List[Respondent]:
 
@@ -138,6 +146,7 @@ def load_respondents(year: int, week_number: int) -> List[Respondent]:
         engine="openpyxl",
     )
 
+    df_respondets = df
     respondents = extract_respodents_from_df(df)
     print(f"Loaded {len(df)} respondents.")
 
@@ -161,6 +170,8 @@ def load_persons(connection) -> List[Person]:
 
         # normalized = normalize_persons(persons_tmp)
         # print(normalized)
+        
+        df_persons = persons_tmp
 
         return extract_persons_from_df(persons=persons_tmp)
 
@@ -240,6 +251,21 @@ def compare_name_to_persons(
 # compare and marge labels
 # faster first run matching uuid only
 
+def list_to_dataframe(input_persons: List[Person]) -> DataFrame:
+    
+    #cols = [
+    #        "unique_id",
+    #        "given_name",
+    #        "family_name",
+    #        "affiliation",
+    #        "gender",
+    #        "labels",
+    #        "foreigner",
+    #    ]
+     
+    return DataFrame.from_records([p.to_dict() for p in input_persons])
+
+
 
 def compare_respondents_to_persons(
     respondents: List[Respondent], persons: List[Person]
@@ -297,6 +323,9 @@ def compare_respondents_to_persons(
                     count = count + 1
 
         print(f"Retrying name-only match... found: {count} matches.")
+
+    resolved = output
+    df_resolved = list_to_dataframe(resolved)
 
     return output
 

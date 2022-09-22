@@ -124,7 +124,7 @@ def resolved_year_week(year: int, week: int):
 
 
 @server.route("/resolved", methods=["GET"])
-def resolved():
+def get_resolved():
     return jsonify(
         compare_respondents_to_persons(respondents=respondents, persons=persons)
     )
