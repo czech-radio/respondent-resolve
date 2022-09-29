@@ -166,7 +166,6 @@ def load_respondents_from_file(filename: str | None) -> List[Respondent]:
     PATH = Path(working_directory)
     FULL_PATH = PATH / f"{filename}"
 
-
     # if Path(FULL_PATH).is_file():
     df = pd.read_excel(
         FULL_PATH,
@@ -180,10 +179,10 @@ def load_respondents_from_file(filename: str | None) -> List[Respondent]:
     print(f"Loaded {len(df)} respondents.")
     for i in respondents:
         print(i.asdict())
-    
+
     return respondents
 
-    #else:
+    # else:
     #    raise Exception("The file must exist.")
 
 
@@ -370,7 +369,7 @@ def compare_respondents_to_persons(
 def persons_to_sqlite(input_persons: List[Person]) -> None:
     con = sqlite3.connect("tmp.sqlite")
     cur = con.cursor()
-    #cur.execute("DROP TABLE person;")
+    # cur.execute("DROP TABLE person;")
     cur.execute(
         "CREATE TABLE person ( openmedia_id,given_name,family_name,affiliation,gender,foreigner,labels);"
     )
