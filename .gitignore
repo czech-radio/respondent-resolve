@@ -6,6 +6,10 @@ __pycache__/
 # secrets
 .env
 
+# DB
+*.sqlite
+
+
 # C extensions
 *.so
 
