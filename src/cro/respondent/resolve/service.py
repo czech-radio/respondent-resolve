@@ -15,11 +15,14 @@ from cro.respondent.resolve.domain import Respondent, Person
 from timeit import default_timer
 from pathlib import Path
 
+import sqlite3
+
 # path to a new xml entries
 
 __all__ = tuple(
     [
         "load_respondents",
+        "load_respondents_from_file",
         "load_persons",
         "create_connection_db",
         "extract_respodents_from_df",
@@ -42,7 +45,7 @@ persons: List[Person] = []
 resolved: List[Person] = []
 
 # storage as dataframes
-df_respondets: DataFrame
+df_respondents: DataFrame
 df_persons: DataFrame
 df_resolved: DataFrame
 
@@ -147,7 +150,27 @@ def load_respondents(year: int, week_number: int) -> List[Respondent]:
         engine="openpyxl",
     )
 
-    df_respondets = df
+    df_respondents = df
+    respondents = extract_respodents_from_df(df)
+    print(f"Loaded {len(df)} respondents.")
+
+    return respondents
+
+
+def load_respondents_from_file(filename: str) -> List[Respondent]:
+
+    working_directory = f"/mnt/R/GŘ/Strategický rozvoj/Kancelář/Analytics/Source/"
+    PATH = Path(working_directory)
+    FULL_PATH = PATH / f"{filename}"
+
+    df = pd.read_excel(
+        FULL_PATH,
+        sheet_name=0,
+        header=None,
+        engine="openpyxl",
+    )
+
+    df_respondents = df
     respondents = extract_respodents_from_df(df)
     print(f"Loaded {len(df)} respondents.")
 
@@ -330,6 +353,36 @@ def compare_respondents_to_persons(
     df_resolved = list_to_dataframe(resolved)
 
     return output
+
+
+def persons_to_sqlite(input_persons: List[Person]) -> None:
+    con = sqlite3.connect("tmp.sqlite")
+    cur = con.cursor()
+    cur.execute("DROP TABLE person;")
+    cur.execute(
+        "CREATE TABLE person ( openmedia_id,given_name,family_name,affiliation,gender,foreigner,labels);"
+    )
+
+    to_db = []
+    for i in input_persons:
+        to_db.append(
+            [
+                i.openmedia_id,
+                i.given_name,
+                i.family_name,
+                i.affiliation,
+                i.gender,
+                i.foreigner,
+                i.labels,
+            ]
+        )
+
+    cur.executemany(
+        "INSERT INTO person ( openmedia_id,given_name,family_name,affiliation,gender,foreigner,labels) VALUES (?, ?, ?, ?, ?, ?, ?);",
+        to_db,
+    )
+    con.commit()
+    con.close()
 
 
 ##############################################################################
