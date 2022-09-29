@@ -40,9 +40,11 @@ def get_respondents(year: int, week: int):
 
     return jsonify(output)
 
+
 @server.route("/respondents", methods=["GET"])
 def get_respondents_file():
 
+    print(request.args.to_dict())
     fn = request.args.get("file")  # .format()
     respondents = load_respondents_from_file(fn)
 
@@ -51,7 +53,6 @@ def get_respondents_file():
         output.append(respondent.asdict())
 
     return jsonify(output)
-
 
 
 @server.route("/persons", methods=["GET"])

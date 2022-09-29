@@ -159,7 +159,7 @@ def load_respondents(year: int, week_number: int) -> List[Respondent]:
 
 def load_respondents_from_file(filename: str | None) -> List[Respondent]:
 
-    if(filename is None):
+    if filename is None:
         raise Exception("The file path must be filled-in.")
 
     working_directory = f"/mnt/R/GŘ/Strategický rozvoj/Kancelář/Analytics/Source/"
@@ -167,24 +167,24 @@ def load_respondents_from_file(filename: str | None) -> List[Respondent]:
     FULL_PATH = PATH / f"{filename}"
 
 
+    # if Path(FULL_PATH).is_file():
+    df = pd.read_excel(
+        FULL_PATH,
+        sheet_name=0,
+        header=None,
+        engine="openpyxl",
+    )
+
+    df_respondents = df
+    respondents = extract_respodents_from_df(df)
+    print(f"Loaded {len(df)} respondents.")
+    for i in respondents:
+        print(i.asdict())
     
-    if( FULL_PATH.is_file() ):
+    return respondents
 
-        df = pd.read_excel(
-            FULL_PATH,
-            sheet_name=0,
-            header=None,
-            engine="openpyxl",
-        )
-
-        df_respondents = df
-        respondents = extract_respodents_from_df(df)
-        print(f"Loaded {len(df)} respondents.")
-        return respondents
-    
-    else:
-        raise Exception("The file must exist.")
-
+    #else:
+    #    raise Exception("The file must exist.")
 
 
 def create_connection_db(connection_str: str):
@@ -207,7 +207,9 @@ def load_persons(connection) -> List[Person]:
 
         df_persons = persons_tmp
 
-        return extract_persons_from_df(persons=persons_tmp)
+        persons = extract_persons_from_df(persons=persons_tmp)
+        persons_to_sqlite(persons)
+        return persons
 
     except Exception as ex:
         logger.error(ex)
@@ -368,7 +370,7 @@ def compare_respondents_to_persons(
 def persons_to_sqlite(input_persons: List[Person]) -> None:
     con = sqlite3.connect("tmp.sqlite")
     cur = con.cursor()
-    cur.execute("DROP TABLE person;")
+    #cur.execute("DROP TABLE person;")
     cur.execute(
         "CREATE TABLE person ( openmedia_id,given_name,family_name,affiliation,gender,foreigner,labels);"
     )
