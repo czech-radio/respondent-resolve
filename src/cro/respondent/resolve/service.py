@@ -157,24 +157,34 @@ def load_respondents(year: int, week_number: int) -> List[Respondent]:
     return respondents
 
 
-def load_respondents_from_file(filename: str) -> List[Respondent]:
+def load_respondents_from_file(filename: str | None) -> List[Respondent]:
+
+    if(filename is None):
+        raise Exception("The file path must be filled-in.")
 
     working_directory = f"/mnt/R/GŘ/Strategický rozvoj/Kancelář/Analytics/Source/"
     PATH = Path(working_directory)
     FULL_PATH = PATH / f"{filename}"
 
-    df = pd.read_excel(
-        FULL_PATH,
-        sheet_name=0,
-        header=None,
-        engine="openpyxl",
-    )
 
-    df_respondents = df
-    respondents = extract_respodents_from_df(df)
-    print(f"Loaded {len(df)} respondents.")
+    
+    if( FULL_PATH.is_file() ):
 
-    return respondents
+        df = pd.read_excel(
+            FULL_PATH,
+            sheet_name=0,
+            header=None,
+            engine="openpyxl",
+        )
+
+        df_respondents = df
+        respondents = extract_respodents_from_df(df)
+        print(f"Loaded {len(df)} respondents.")
+        return respondents
+    
+    else:
+        raise Exception("The file must exist.")
+
 
 
 def create_connection_db(connection_str: str):
