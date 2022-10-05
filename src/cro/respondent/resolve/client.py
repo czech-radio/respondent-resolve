@@ -43,7 +43,6 @@ def files():
 
 @app.route("/")
 def index():
-    time.sleep(2)
     return render_template("persons_table.html", title="CRO respondents resolver")
 
 

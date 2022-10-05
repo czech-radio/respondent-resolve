@@ -159,4 +159,6 @@ def main():
     server.config["JSON_SORT_KEYS"] = False
     WSGIRequestHandler.protocol_version = "HTTP/1.1"
 
+    load_saved_persons()
+
     server.run(debug=True)

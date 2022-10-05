@@ -21,6 +21,7 @@ import sqlite3
 
 __all__ = tuple(
     [
+        "load_saved_persons",
         "load_respondents",
         "load_respondents_from_file",
         "load_persons",
@@ -50,6 +51,35 @@ df_persons: DataFrame
 df_resolved: DataFrame
 
 #########################################
+
+
+def extract_persons_from_sqlite(dataframe: pd.DataFrame) -> List[Respondent]:
+
+    output = []
+
+    for i, person in dataframe.iterrows():
+        output.append(
+            Respondent(
+                openmedia_id=person.openmedia_id,
+                given_name=person.given_name,
+                family_name=person.family_name,
+                affiliation=person.affiliation,
+                labels=person.labels,
+                gender=person.gender,
+                foreigner=person.foreigner,
+                matching_ids=[],
+            )
+        )
+
+    return output
+
+
+def load_saved_persons():
+    con = sqlite3.connect("tmp.sqlite")
+    df = pd.read_sql("select * from person", con)
+    df_persons = df.copy()
+    persons = extract_persons_from_sqlite(df)
+    print(f"Loaded {len(persons)} persons from local database.")
 
 
 def extract_respodents_from_df(dataframe: pd.DataFrame) -> List[Respondent]:
@@ -106,7 +136,7 @@ def extract_persons_from_df(persons: pd.DataFrame) -> List[Person]:
                 labels=person.labels,
                 gender=person.gender,
                 foreigner=person.foreigner,
-                matching_ids=[""],
+                matching_ids=[],
             )
         )
 
@@ -204,7 +234,7 @@ def load_persons(connection) -> List[Person]:
         # normalized = normalize_persons(persons_tmp)
         # print(normalized)
 
-        df_persons = persons_tmp
+        df_persons = persons_tmp.copy()
 
         persons = extract_persons_from_df(persons=persons_tmp)
         persons_to_sqlite(persons)
@@ -347,20 +377,20 @@ def compare_respondents_to_persons(
     print(f"Found: {count} matches.")
 
     # if none found try name only match
-    if count == 0:
-        for respondent in respondents:
-            for person in persons:
-                if (
-                    respondent.given_name == person.given_name
-                    and respondent.family_name == person.family_name
-                ):
-                    respondent.add_matching_id(person.openmedia_id)
-                    output.append(respondent)
-                    count = count + 1
+    # if count == 0:
+    #    for respondent in respondents:
+    #        for person in persons:
+    #            if (
+    #                respondent.given_name == person.given_name
+    #                and respondent.family_name == person.family_name
+    #            ):
+    #                respondent.add_matching_id(person.openmedia_id)
+    #                output.append(respondent)
+    #                count = count + 1
 
-        print(f"Retrying name-only match... found: {count} matches.")
+    #    print(f"Retrying name-only match... found: {count} matches.")
 
-    resolved = output
+    resolved = output.copy()
     df_resolved = list_to_dataframe(resolved)
 
     return output
@@ -369,7 +399,7 @@ def compare_respondents_to_persons(
 def persons_to_sqlite(input_persons: List[Person]) -> None:
     con = sqlite3.connect("tmp.sqlite")
     cur = con.cursor()
-    # cur.execute("DROP TABLE person;")
+    cur.execute("DROP TABLE person;")
     cur.execute(
         "CREATE TABLE person ( openmedia_id,given_name,family_name,affiliation,gender,foreigner,labels);"
     )
