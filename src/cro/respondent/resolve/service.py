@@ -44,6 +44,7 @@ __all__ = tuple(
 respondents: List[Person] = []
 persons: List[Person] = []
 resolved: List[Person] = []
+unmatched: List[Person] = []
 
 # storage as dataframes
 df_respondents: DataFrame
@@ -367,10 +368,13 @@ def compare_respondents_to_persons(
     #            count = count + 1
 
     output = []
+    unmatched_tmp = []
 
     # variant 2 compare lists directly
     count = 0
+    unm_cnt = 0
     for respondent in respondents:
+        matching = False
         for person in persons:
             if (
                 respondent.given_name == person.given_name
@@ -379,9 +383,13 @@ def compare_respondents_to_persons(
             ):
                 respondent.add_matching_id(person.openmedia_id)
                 output.append(respondent)
+                matching = True
                 count = count + 1
+        if not matching:
+            unmatched_tmp.append(respondent)
+            unm_cnt = unm_cnt + 1
 
-    print(f"Found: {count} matches.")
+    print(f"Found: {count} matches and {unm_cnt} new ones.")
 
     # if none found try name only match
     # if count == 0:
@@ -397,7 +405,13 @@ def compare_respondents_to_persons(
 
     #    print(f"Retrying name-only match... found: {count} matches.")
 
-    resolved = output.copy()
+    global unmatched
+    unmatched = unmatched_tmp
+
+    global resolved
+    resolved = output
+
+    global df_resolved
     df_resolved = list_to_dataframe(resolved)
 
     return output

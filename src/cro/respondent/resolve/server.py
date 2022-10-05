@@ -38,6 +38,7 @@ def get_version():
 @server.route("/respondents/<year>/<week>", methods=["GET"])
 def get_respondents(year: int, week: int):
 
+    global respondents
     respondents = load_respondents(year=year, week_number=week)
 
     output = []
@@ -131,7 +132,8 @@ def resolved_year_week(year: int, week: int):
     # new thread
     # persons = load_persons(con)
 
-    # respondents = load_respondents(year=year, week_number=week)
+    global respondents
+    respondents = load_respondents(year=year, week_number=week)
 
     global resolved
     resolved = compare_respondents_to_persons(respondents=respondents, persons=persons)
@@ -148,9 +150,15 @@ def resolved_year_week(year: int, week: int):
 
 @server.route("/resolved", methods=["GET"])
 def get_resolved():
-    return jsonify(
-        compare_respondents_to_persons(respondents=respondents, persons=persons)
-    )
+
+    global resolved
+    resolved = compare_respondents_to_persons(respondents=respondents, persons=persons)
+
+    output = []
+    for entry in resolved:
+        output.append(entry.asdict())
+
+    return jsonify(output)
 
 
 def create_app() -> Flask:
