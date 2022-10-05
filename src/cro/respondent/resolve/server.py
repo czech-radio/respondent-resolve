@@ -26,7 +26,13 @@ server = Flask(__name__)
 
 @server.route("/", methods=["GET"])
 def get_version():
-    return jsonify([{"server": "cro-respondent-resolve"}, {"version": "0.1.0"}])
+    return jsonify(
+        [
+            {"server": "cro-respondent-resolve"},
+            {"version": "0.1.0"},
+            {"persons": f"{len(persons)}"},
+        ]
+    )
 
 
 @server.route("/respondents/<year>/<week>", methods=["GET"])
@@ -46,6 +52,8 @@ def get_respondents_file():
 
     print(request.args.to_dict())
     fn = request.args.get("file")  # .format()
+
+    global respondents
     respondents = load_respondents_from_file(fn)
 
     output = []
@@ -57,10 +65,10 @@ def get_respondents_file():
 
 @server.route("/persons", methods=["GET"])
 def get_persons():
-    con = create_connection_db(
-        f"dbname={AURA_TARGET_NAME} user={AURA_TARGET_USER} host={AURA_TARGET_HOST} port={AURA_TARGET_PORT} password={AURA_TARGET_PASS}"
-    )
-    persons = load_persons(con)
+    # con = create_connection_db(
+    #    f"dbname={AURA_TARGET_NAME} user={AURA_TARGET_USER} host={AURA_TARGET_HOST} port={AURA_TARGET_PORT} password={AURA_TARGET_PASS}"
+    # )
+    # persons = load_persons(con)
 
     output = []
     for person in persons:
@@ -71,10 +79,10 @@ def get_persons():
 
 @server.route("/persons/filter", methods=["GET"])
 def get_person_tmp():
-    con = create_connection_db(
-        f"dbname={AURA_TARGET_NAME} user={AURA_TARGET_USER} host={AURA_TARGET_HOST} port={AURA_TARGET_PORT} password={AURA_TARGET_PASS}"
-    )
-    persons = load_persons(con)
+    # con = create_connection_db(
+    #    f"dbname={AURA_TARGET_NAME} user={AURA_TARGET_USER} host={AURA_TARGET_HOST} port={AURA_TARGET_PORT} password={AURA_TARGET_PASS}"
+    # )
+    # persons = load_persons(con)
 
     print(request.args.to_dict())
     uuid = request.args.get("uuid")  # .format()
@@ -116,15 +124,16 @@ def get_person_tmp():
 @server.route("/resolved/<year>/<week>", methods=["GET"])
 def resolved_year_week(year: int, week: int):
 
-    con = create_connection_db(
-        f"dbname={AURA_TARGET_NAME} user={AURA_TARGET_USER} host={AURA_TARGET_HOST} port={AURA_TARGET_PORT} password={AURA_TARGET_PASS}"
-    )
+    # con = create_connection_db(
+    #    f"dbname={AURA_TARGET_NAME} user={AURA_TARGET_USER} host={AURA_TARGET_HOST} port={AURA_TARGET_PORT} password={AURA_TARGET_PASS}"
+    # )
 
     # new thread
-    persons = load_persons(con)
+    # persons = load_persons(con)
 
-    respondents = load_respondents(year=year, week_number=week)
+    # respondents = load_respondents(year=year, week_number=week)
 
+    global resolved
     resolved = compare_respondents_to_persons(respondents=respondents, persons=persons)
 
     output = []
@@ -152,13 +161,15 @@ def main():
     """
     The main application function.
     """
+
+    global persons
+    persons = load_saved_persons()
+
     server = create_app()
 
     # config Server app
     server.config["JSON_AS_ASCII"] = False
     server.config["JSON_SORT_KEYS"] = False
     WSGIRequestHandler.protocol_version = "HTTP/1.1"
-
-    load_saved_persons()
 
     server.run(debug=True)

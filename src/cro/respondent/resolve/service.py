@@ -74,12 +74,13 @@ def extract_persons_from_sqlite(dataframe: pd.DataFrame) -> List[Respondent]:
     return output
 
 
-def load_saved_persons():
+def load_saved_persons() -> List[Person]:
     con = sqlite3.connect("tmp.sqlite")
     df = pd.read_sql("select * from person", con)
     df_persons = df.copy()
     persons = extract_persons_from_sqlite(df)
     print(f"Loaded {len(persons)} persons from local database.")
+    return persons
 
 
 def extract_respodents_from_df(dataframe: pd.DataFrame) -> List[Respondent]:
@@ -180,7 +181,9 @@ def load_respondents(year: int, week_number: int) -> List[Respondent]:
         engine="openpyxl",
     )
 
+    global df_respondents
     df_respondents = df
+    global respondents
     respondents = extract_respodents_from_df(df)
     print(f"Loaded {len(df)} respondents.")
 
@@ -204,7 +207,9 @@ def load_respondents_from_file(filename: str | None) -> List[Respondent]:
         engine="openpyxl",
     )
 
+    global df_respondents
     df_respondents = df
+    global respondents
     respondents = extract_respodents_from_df(df)
     print(f"Loaded {len(df)} respondents.")
     for i in respondents:
@@ -234,8 +239,10 @@ def load_persons(connection) -> List[Person]:
         # normalized = normalize_persons(persons_tmp)
         # print(normalized)
 
+        global df_persons
         df_persons = persons_tmp.copy()
 
+        global persons
         persons = extract_persons_from_df(persons=persons_tmp)
         persons_to_sqlite(persons)
         return persons
