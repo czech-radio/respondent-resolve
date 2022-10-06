@@ -26,6 +26,8 @@ setup(
     packages=find_namespace_packages(where="src", include=[f"{NAMESPACE}.*"]),
     install_requires=[
         "pandas",
+        "dash",
+        "dash_bootstrap_components",
         "flask-restful",
         "psycopg2",
         "loguru",

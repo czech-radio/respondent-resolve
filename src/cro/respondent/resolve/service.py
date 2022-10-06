@@ -309,12 +309,16 @@ def get_person_by_full_name(
 
 
 def compare_name_to_persons(
-    family_name: str, given_name: str, input_persons: List[Person]
+    family_name: str, given_name: str, affiliation: str, input_persons: List[Person]
 ) -> List[Respondent]:
     output = []
 
     for person in input_persons:
-        if given_name == person.given_name and family_name == person.family_name:
+        if (
+            given_name == person.given_name
+            and family_name == person.family_name
+            and affiliation == person.affiliation
+        ):
             output.append(person)
 
     return output
