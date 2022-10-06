@@ -393,6 +393,21 @@ def compare_respondents_to_persons(
             unmatched_tmp.append(respondent)
             unm_cnt = unm_cnt + 1
 
+    # remove duplicate entries
+    unique_list = []
+    unique_unmatched = []
+    unique_all = []
+
+    for x in output:
+        if x not in unique_list:
+            unique_list.append(x)
+            unique_all.append(x)
+
+    for x in unmatched_tmp:
+        if x not in unique_unmatched:
+            unique_unmatched.append(x)
+            unique_all.append(x)
+
     print(f"Found: {count} matches and {unm_cnt} new ones.")
 
     # if none found try name only match
@@ -410,15 +425,15 @@ def compare_respondents_to_persons(
     #    print(f"Retrying name-only match... found: {count} matches.")
 
     global unmatched
-    unmatched = unmatched_tmp
+    unmatched = unique_unmatched
 
     global resolved
-    resolved = output
+    resolved = unique_all
 
     global df_resolved
     df_resolved = list_to_dataframe(resolved)
 
-    return output
+    return unique_all
 
 
 def persons_to_sqlite(input_persons: List[Person]) -> None:
