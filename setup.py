@@ -29,6 +29,7 @@ setup(
         "dash",
         "dash_bootstrap_components",
         "flask-restful",
+        "flask_sqlalchemy",
         "psycopg2",
         "loguru",
         "openpyxl",
