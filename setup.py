@@ -39,7 +39,8 @@ setup(
     extras_require={"dev": TEST_DEPS + LINT_DEPS + DOCS_DEPS},
     entry_points={
         "console_scripts": [
-            f"{PACKAGE_NAME}={PACKAGE_PATH}.server:main",
+            f"{PACKAGE_NAME}-server={PACKAGE_PATH}.server:main",
+            f"{PACKAGE_NAME}-client={PACKAGE_PATH}.client:main",
         ]
     },
 )

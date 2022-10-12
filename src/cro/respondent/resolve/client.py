@@ -19,7 +19,7 @@ ids = list(range(0, len(df_original)))
 df = df_original[cols]
 
 df["id"] = ids
-#df["nmid"] = nmatch
+# df["nmid"] = nmatch
 df["matching_ids"] = matching_ids
 
 
@@ -35,7 +35,7 @@ app.layout = html.Div(
             id="respondents-table",
             data=df.to_dict("records"),
             columns=[{"id": c, "name": c} for c in df.columns],
-            hidden_columns=["id","openmedia_id"],
+            hidden_columns=["id", "openmedia_id"],
             style_cell_conditional=[
                 {"if": {"column_id": c}, "textAlign": "left"}
                 for c in ["given_name", "family_name", "affiliation", "labels"]
@@ -95,8 +95,8 @@ def update_graphs(row_ids, selected_row_ids, active_cell):
     current = df.loc[active_row_id]
 
     resolved = pd.DataFrame()
-    print(len(current['matching_ids'].split(";")))
-    print(current['family_name'])
+    print(len(current["matching_ids"].split(";")))
+    print(current["family_name"])
 
     # check if empty == 0
     if len(current["matching_ids"].split(";")) > 1:
@@ -107,10 +107,12 @@ def update_graphs(row_ids, selected_row_ids, active_cell):
                 )
                 resolved = pd.concat([resolved, tmp], axis=0)
     else:
-        family_name = urllib.parse.quote(current["family_name"],safe="")
-        tmp = pd.read_json(f"http://localhost:5000/persons/filter?family_name={family_name}")
+        family_name = urllib.parse.quote(current["family_name"], safe="")
+        tmp = pd.read_json(
+            f"http://localhost:5000/persons/filter?family_name={family_name}"
+        )
         print(tmp)
-        resolved = pd.concat([resolved,tmp],axis=0)
+        resolved = pd.concat([resolved, tmp], axis=0)
 
     if resolved.empty:
         return ["not found"]
