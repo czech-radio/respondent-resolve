@@ -1,5 +1,6 @@
 import os
 import time
+import urllib.parse
 
 from dash import Dash, dash_table, Input, Output, callback, html
 import dash_bootstrap_components as dbc
@@ -34,7 +35,7 @@ app.layout = html.Div(
             id="respondents-table",
             data=df.to_dict("records"),
             columns=[{"id": c, "name": c} for c in df.columns],
-            hidden_columns=["id"],
+            hidden_columns=["id","openmedia_id"],
             style_cell_conditional=[
                 {"if": {"column_id": c}, "textAlign": "left"}
                 for c in ["given_name", "family_name", "affiliation", "labels"]
@@ -93,20 +94,32 @@ def update_graphs(row_ids, selected_row_ids, active_cell):
 
     current = df.loc[active_row_id]
 
-    print(current["matching_ids"].split(";"))
-    # print(current['matching_ids'].split(";"))
     resolved = pd.DataFrame()
+    print(len(current['matching_ids'].split(";")))
+    print(current['family_name'])
 
-    for matching_id in current["matching_ids"].split(";"):
-        if matching_id:
-            tmp = pd.read_json(
-                f"http://localhost:5000/persons/filter?uuid={matching_id}"
-            )
-            resolved = pd.concat([resolved, tmp], axis=0)
+    # check if empty == 0
+    if len(current["matching_ids"].split(";")) > 1:
+        for matching_id in current["matching_ids"].split(";"):
+            if matching_id:
+                tmp = pd.read_json(
+                    f"http://localhost:5000/persons/filter?uuid={matching_id}"
+                )
+                resolved = pd.concat([resolved, tmp], axis=0)
+    else:
+        family_name = urllib.parse.quote(current["family_name"],safe="")
+        tmp = pd.read_json(f"http://localhost:5000/persons/filter?family_name={family_name}")
+        print(tmp)
+        resolved = pd.concat([resolved,tmp],axis=0)
+
+    if resolved.empty:
+        return ["not found"]
+
     cols = [col for col in df_original.columns if not (col.endswith("matching_ids"))]
     resolved = resolved[cols]
     ids = list(range(0, len(resolved)))
     resolved["id"] = ids
+
     print(resolved)
 
     return html.Div(
@@ -115,7 +128,7 @@ def update_graphs(row_ids, selected_row_ids, active_cell):
                 id="matching-table",
                 data=resolved.to_dict("records"),
                 columns=[{"id": c, "name": c} for c in resolved.columns],
-                hidden_columns=["matching_ids", "openmedia_id", "id"],
+                hidden_columns=["openmedia_id", "matching_ids", "id"],
                 style_cell_conditional=[
                     {"if": {"column_id": c}, "textAlign": "left"}
                     for c in ["given_name", "family_name", "affiliation", "labels"]
