@@ -384,6 +384,10 @@ def compare_respondents_to_persons(
                 respondent.given_name == person.given_name
                 and respondent.family_name == person.family_name
                 and respondent.affiliation == person.affiliation
+                and len(
+                    [x.lower() for x in respondent.labels if x.lower() in person.labels]
+                )
+                > 0
             ):
                 respondent.add_matching_id(person.openmedia_id)
                 output.append(respondent)

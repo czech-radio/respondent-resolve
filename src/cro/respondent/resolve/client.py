@@ -13,7 +13,7 @@ from flask_sqlalchemy import SQLAlchemy
 
 df_original = pd.read_json("http://localhost:5000/resolved/2022/36", orient="records")
 cols = [col for col in df_original.columns if not (col.endswith("matching_ids"))]
-nmatch = [len(i) - 1 for i in df_original["matching_ids"]]
+# nmatch = [len(i) - 1 for i in df_original["matching_ids"]]
 matching_ids = [";".join(i) for i in df_original["matching_ids"]]
 ids = list(range(0, len(df_original)))
 df = df_original[cols]
@@ -46,10 +46,11 @@ app.layout = html.Div(
             #      } for field in df.columns
             #     ],
             style_as_list_view=True,
+            style_table={"overflowY": "scroll", "height": "400px"},
             style_cell={
                 "overflow": "hidden",
                 "textOverflow": "ellipsis",
-                "maxWidth": 150,
+                "maxWidth": 50,
                 "padding": "5px",
             },
             style_header={
@@ -65,8 +66,8 @@ app.layout = html.Div(
             selected_columns=[],
             selected_rows=[],
             page_action="native",
-            page_current=0,
-            page_size=15,
+            # page_current=0,
+            # page_size=15,
         ),
         html.Div(id="container"),
     ]
@@ -155,5 +156,5 @@ def update_graphs(row_ids, selected_row_ids, active_cell):
     )
 
 
-if __name__ == "__main__":
+def main():
     app.run_server(host="0.0.0.0", debug=True, port=5001)
