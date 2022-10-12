@@ -18,7 +18,7 @@ ids = list(range(0, len(df_original)))
 df = df_original[cols]
 
 df["id"] = ids
-df["nmid"] = nmatch
+#df["nmid"] = nmatch
 df["matching_ids"] = matching_ids
 
 
@@ -34,7 +34,7 @@ app.layout = html.Div(
             id="respondents-table",
             data=df.to_dict("records"),
             columns=[{"id": c, "name": c} for c in df.columns],
-            hidden_columns=["matching_ids", "openmedia_id", "id"],
+            hidden_columns=["id"],
             style_cell_conditional=[
                 {"if": {"column_id": c}, "textAlign": "left"}
                 for c in ["given_name", "family_name", "affiliation", "labels"]
