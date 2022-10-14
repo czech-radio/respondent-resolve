@@ -1,7 +1,6 @@
 # cro-respondent-resolve
 
-[![build](https://github.com/czech-radio/cro-respondent-resolve/actions/workflows/main.yml/badge.svg)](https://github.com/czech-radio/
-cro-respondent-resolve/actions/workflows/main.yml)
+[![build](https://github.com/czech-radio/cro-respondent-resolve/actions/workflows/main.yml/badge.svg)](https://github.com/czech-radio/cro-respondent-resolve/actions/workflows/main.yml)
 ![version](https://img.shields.io/badge/version-0.1.0-blue.svg)
 ![language](https://img.shields.io/badge/language-Python-blue.svg)
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/73277f30f0ed43daaef0a8cee576cc98)](https://www.codacy.com/gh/czech-radio/cro-respondent-resolve/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=czech-radio/cro-respondent-resolve&amp;utm_campaign=Badge_Grade)
