@@ -1,5 +1,7 @@
 # cro-respondent-resolve
 
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/f43bda46fab747159b2144da084da2c0)](https://app.codacy.com/gh/czech-radio/cro-respondent-resolve?utm_source=github.com&utm_medium=referral&utm_content=czech-radio/cro-respondent-resolve&utm_campaign=Badge_Grade_Settings)
+
 About&hellip;
 
 ## Install
