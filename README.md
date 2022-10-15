@@ -5,38 +5,40 @@
 ![language](https://img.shields.io/badge/language-Python-blue.svg)
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/73277f30f0ed43daaef0a8cee576cc98)](https://www.codacy.com/gh/czech-radio/cro-respondent-resolve/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=czech-radio/cro-respondent-resolve&amp;utm_campaign=Badge_Grade)
 
-About&hellip;
+**The web application speeding up the manual identification of respondents from the OpenMedia system.**
 
-## Install
+*More detail description here.*
 
-...
+## Installation
 
-## Usage
+&hellip;
 
-...
+## Features and Usage
 
-## how to run backend
+&hellip;
 
+## Development
+
+## How to run backend
 
 To run backend server do:
 
-```
+```shell
 source .env/bin/activate
 pip install -e .
 source .env
 cro-respondent-resolve
 ```
 
-note the `.env` file, which contains following DB connection details:
+Note the `.env` file, which contains following database connection credentials:
 
-```
+```shell
 export AURA_TARGET_HOST=secret
 export AURA_TARGET_PORT=secret
 export AURA_TARGET_NAME=secret
 export AURA_TARGET_USER=secret
 export AURA_TARGET_PASS=secret
 ```
-
 
 In the browser you then can point to `https://localhost:5000`
 
@@ -53,3 +55,7 @@ returns matching persons (needs prior call `/persons` and `/respondents`)
 
 `/resolved/<year: int>/<week: int>`
 runs all above at once and returns persons with matching_ids as JSON
+
+## How to run frontend
+
+&hellip;
