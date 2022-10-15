@@ -19,7 +19,7 @@
 
 ## Development
 
-## How to run backend
+### How to run backend
 
 To run backend server do:
 
@@ -56,6 +56,6 @@ returns matching persons (needs prior call `/persons` and `/respondents`)
 `/resolved/<year: int>/<week: int>`
 runs all above at once and returns persons with matching_ids as JSON
 
-## How to run frontend
+### How to run frontend
 
 &hellip;
