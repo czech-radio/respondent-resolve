@@ -1,14 +1,17 @@
 import os
+import io
 import time
 import urllib.parse
 
+import base64
+import requests
 from dash import Dash, dash_table, Input, Output, callback, html, dcc
 from dash.dependencies import Input, Output, State
 import dash_bootstrap_components as dbc
 
 import pandas as pd
 
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, request_started
 from flask_sqlalchemy import SQLAlchemy
 
 df = pd.DataFrame()
@@ -33,7 +36,7 @@ app = Dash(__name__)
 app.layout = html.Div(
     [
         dcc.Upload(
-            id="upload_data",
+            id="upload-data",
             children=html.Div(
                 ["drag and drop to import or click to ", html.A("select files")]
             ),
@@ -97,6 +100,11 @@ def parse_contents(contents, filename, date):
     content_type, content_string = contents.split(",")
 
     decoded = base64.b64decode(content_string)
+
+    post_data = io.BytesIO(decoded)
+
+    df = pd.DataFrame()
+
     try:
         # if 'csv' in filename:
         #    # Assume that the user uploaded a CSV file
@@ -105,7 +113,7 @@ def parse_contents(contents, filename, date):
         # elif 'xls' in filename:
         #    # Assume that the user uploaded an excel file
         #    df_original = pd.read_excel(io.BytesIO(decoded))
-        if "xlsx" in filename:
+        if "xlsx" in filename.lower():
             # assume the file is zipped xls
             # df_original = pd.read_excel(
             #        io.BytesIO(decoded),
@@ -114,9 +122,12 @@ def parse_contents(contents, filename, date):
             #        engine="openpyxl"
             #        )
             print(f" loading {filename}")
-            df_original = pd.read_json(
-                f"http://localhost:5000/uploader?file={filename}", orient="records"
-            )
+
+            # POST data to server
+            url = f"http://localhost:5000/uploader?file={filename}"
+            files = {"file": post_data}
+            requests.post(url, files=files)
+
     except Exception as e:
         print(e)
         return html.Div(["There was an error processing this file."])
@@ -135,9 +146,6 @@ def parse_contents(contents, filename, date):
         [
             html.H5(filename),
             html.H6(datetime.datetime.fromtimestamp(date)),
-            dash_table.DataTable(
-                df.to_dict("records"), [{"name": i, "id": i} for i in df.columns]
-            ),
             html.Hr(),  # horizontal line
             # For debugging, display the raw contents provided by the web browser
             html.Div("Raw Content"),
@@ -156,6 +164,7 @@ def parse_contents(contents, filename, date):
     State("upload-data", "last_modified"),
 )
 def update_output(list_of_contents, list_of_names, list_of_dates):
+    print(f" file(s) update {list_of_names}")
     if list_of_contents is not None:
         children = [
             parse_contents(c, n, d)

@@ -196,7 +196,7 @@ def load_respondents_from_file(filename: str | None) -> List[Respondent]:
     if filename is None:
         raise Exception("The file path must be filled-in.")
 
-    working_directory = f"/mnt/R/GŘ/Strategický rozvoj/Kancelář/Analytics/Source/"
+    working_directory = f"uploads/"
     PATH = Path(working_directory)
     FULL_PATH = PATH / f"{filename}"
 

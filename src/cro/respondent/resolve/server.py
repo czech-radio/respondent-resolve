@@ -36,16 +36,18 @@ def get_version():
     )
 
 
-@server.route("/uploader", methods=["GET", "POST"])
+@server.route("/uploader", methods=["POST"])
 def upload_file():
+    output = []
+
     if request.method == "POST":
+        fn = request.args.get("file")  # .format()
         f = request.files["file"]
-        f.save(secure_filename(f.filename))
+        f.save("uploads/{fn}")
 
         global respondents
         respondents = load_respondents_from_file(fn)
 
-        output = []
         for respondent in respondents:
             output.append(respondent.asdict())
 
@@ -195,6 +197,7 @@ def main():
     # config Server app
     server.config["JSON_AS_ASCII"] = False
     server.config["JSON_SORT_KEYS"] = False
+    server.config["UPLOAD_FOLDER"] = "uploads"
     WSGIRequestHandler.protocol_version = "HTTP/1.1"
 
     server.run(debug=True)

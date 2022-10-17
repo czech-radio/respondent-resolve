@@ -30,6 +30,7 @@ setup(
         "dash_bootstrap_components",
         "flask-restful",
         "flask_sqlalchemy",
+        "requests",
         "psycopg2",
         "loguru",
         "openpyxl",
