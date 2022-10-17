@@ -1,9 +1,11 @@
 import os
 import io
+import datetime
 import time
 import urllib.parse
 
 import base64
+
 import requests
 from dash import Dash, dash_table, Input, Output, callback, html, dcc
 from dash.dependencies import Input, Output, State
@@ -53,44 +55,6 @@ app.layout = html.Div(
             multiple=True,
         ),
         html.Div(id="output-data-upload"),
-        dash_table.DataTable(
-            id="respondents-table",
-            data=df.to_dict("records"),
-            columns=[{"id": c, "name": c} for c in df.columns],
-            hidden_columns=["id", "openmedia_id"],
-            style_cell_conditional=[
-                {"if": {"column_id": c}, "textAlign": "left"}
-                for c in ["given_name", "family_name", "affiliation", "labels"]
-            ],
-            # style_data_coditional=[
-            #     {"if": {'column_id': 'nmid', 'filter_query': '{' + field + '}' + ' < 1 '},
-            #         'backgroundColor': '#ffcc00'
-            #      } for field in df.columns
-            #     ],
-            style_as_list_view=True,
-            style_table={"overflowY": "scroll", "height": "400px"},
-            style_cell={
-                "overflow": "hidden",
-                "textOverflow": "ellipsis",
-                "maxWidth": 50,
-                "padding": "5px",
-            },
-            style_header={
-                "backgroundColor": "white",
-                "fontWeight": "bold",
-                "border": "1px solid black",
-            },
-            editable=True,
-            sort_action="native",
-            sort_mode="multi",
-            row_selectable="multi",
-            # row_deletable=True,
-            selected_columns=[],
-            selected_rows=[],
-            page_action="native",
-            # page_current=0,
-            # page_size=15,
-        ),
         html.Div(id="container"),
     ]
 )
@@ -103,7 +67,7 @@ def parse_contents(contents, filename, date):
 
     post_data = io.BytesIO(decoded)
 
-    df = pd.DataFrame()
+    df_original = pd.DataFrame()
 
     try:
         # if 'csv' in filename:
@@ -127,6 +91,9 @@ def parse_contents(contents, filename, date):
             url = f"http://localhost:5000/uploader?file={filename}"
             files = {"file": post_data}
             requests.post(url, files=files)
+            df_original = pd.read_json(url, orient="records")
+        else:
+            return html.Div("File must be in xlsx format")
 
     except Exception as e:
         print(e)
@@ -142,16 +109,50 @@ def parse_contents(contents, filename, date):
     # df["nmid"] = nmatch
     df["matching_ids"] = matching_ids
 
+    print("Data loaded Ok")
+
     return html.Div(
         [
             html.H5(filename),
             html.H6(datetime.datetime.fromtimestamp(date)),
             html.Hr(),  # horizontal line
-            # For debugging, display the raw contents provided by the web browser
-            html.Div("Raw Content"),
-            html.Pre(
-                contents[0:200] + "...",
-                style={"whiteSpace": "pre-wrap", "wordBreak": "break-all"},
+            dash_table.DataTable(
+                id="respondents-table",
+                columns=[{"id": c, "name": c} for c in df.columns],
+                hidden_columns=["id", "openmedia_id"],
+                data=df.to_dict("records"),
+                style_cell_conditional=[
+                    {"if": {"column_id": c}, "textAlign": "left"}
+                    for c in ["given_name", "family_name", "affiliation", "labels"]
+                ],
+                # style_data_coditional=[
+                #     {"if": {'column_id': 'nmid', 'filter_query': '{' + field + '}' + ' < 1 '},
+                #         'backgroundColor': '#ffcc00'
+                #      } for field in df.columns
+                #     ],
+                style_as_list_view=True,
+                style_table={"overflowY": "scroll", "height": "400px"},
+                style_cell={
+                    "overflow": "hidden",
+                    "textOverflow": "ellipsis",
+                    "maxWidth": 50,
+                    "padding": "5px",
+                },
+                style_header={
+                    "backgroundColor": "white",
+                    "fontWeight": "bold",
+                    "border": "1px solid black",
+                },
+                editable=True,
+                sort_action="native",
+                sort_mode="multi",
+                row_selectable="multi",
+                # row_deletable=True,
+                selected_columns=[],
+                selected_rows=[],
+                page_action="native",
+                # page_current=0,
+                # page_size=15,
             ),
         ]
     )
@@ -164,7 +165,7 @@ def parse_contents(contents, filename, date):
     State("upload-data", "last_modified"),
 )
 def update_output(list_of_contents, list_of_names, list_of_dates):
-    print(f" file(s) update {list_of_names}")
+    print(f"file(s) updated: {list_of_names}")
     if list_of_contents is not None:
         children = [
             parse_contents(c, n, d)

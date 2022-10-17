@@ -36,22 +36,25 @@ def get_version():
     )
 
 
-@server.route("/uploader", methods=["POST"])
+@server.route("/uploader", methods=["POST", "GET"])
 def upload_file():
-    output = []
+    fn = request.args.get("file")  # .format()
 
     if request.method == "POST":
-        fn = request.args.get("file")  # .format()
         f = request.files["file"]
-        f.save("uploads/{fn}")
+        f.save(f"uploads/{fn}")
 
-        global respondents
-        respondents = load_respondents_from_file(fn)
+    global respondents
+    respondents = load_respondents_from_file(fn)
 
-        for respondent in respondents:
-            output.append(respondent.asdict())
+    global resolved
+    resolved = compare_respondents_to_persons(respondents=respondents, persons=persons)
 
-        return jsonify(output)
+    output = []
+    for result in resolved:
+        output.append(result.asdict())
+
+    return jsonify(output)
 
 
 @server.route("/respondents/<year>/<week>", methods=["GET"])
