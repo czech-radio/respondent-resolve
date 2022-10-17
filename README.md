@@ -4,6 +4,7 @@
 ![version](https://img.shields.io/badge/version-0.1.0-blue.svg)
 ![language](https://img.shields.io/badge/language-Python-blue.svg)
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/73277f30f0ed43daaef0a8cee576cc98)](https://www.codacy.com/gh/czech-radio/cro-respondent-resolve/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=czech-radio/cro-respondent-resolve&amp;utm_campaign=Badge_Grade)
+[![DeepSource](https://deepsource.io/gh/groundf/cro-respondent-resolve.svg/?label=active+issues&show_trend=true&token=q0UMxBlUVTLnFKwkJyAu4uwq)](https://deepsource.io/gh/groundf/cro-respondent-resolve/?ref=repository-badge)
 
 **The web application speeding up the manual identification of respondents from the OpenMedia system.**
 
