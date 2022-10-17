@@ -7,6 +7,7 @@ import os
 
 from flask import Flask, request, jsonify
 from werkzeug.serving import WSGIRequestHandler
+from werkzeug.utils import secure_filename
 
 # from tasks import threaded_task
 
@@ -33,6 +34,22 @@ def get_version():
             {"persons": f"{len(persons)}"},
         ]
     )
+
+
+@server.route("/uploader", methods=["GET", "POST"])
+def upload_file():
+    if request.method == "POST":
+        f = request.files["file"]
+        f.save(secure_filename(f.filename))
+
+        global respondents
+        respondents = load_respondents_from_file(fn)
+
+        output = []
+        for respondent in respondents:
+            output.append(respondent.asdict())
+
+        return jsonify(output)
 
 
 @server.route("/respondents/<year>/<week>", methods=["GET"])
