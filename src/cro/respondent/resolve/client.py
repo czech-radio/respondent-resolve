@@ -57,9 +57,11 @@ app.layout = html.Div(
         html.Div(id="output-data-upload"),
         dash_table.DataTable(
             id="respondents-table",
-            columns=[{"id": c, "name": c} for c in df.columns],
+            data=[],
+            columns=[],
+            # columns=[{"id": c, "name": c} for c in df.columns],
             hidden_columns=["id", "openmedia_id"],
-            data=df.to_dict("records"),
+            # data=df.to_dict("records"),
             style_cell_conditional=[
                 {"if": {"column_id": c}, "textAlign": "left"}
                 for c in ["given_name", "family_name", "affiliation", "labels"]
@@ -130,8 +132,9 @@ def parse_contents(contents, filename, date):
             url = f"http://localhost:5000/uploader?file={filename}"
             files = {"file": post_data}
             response = requests.post(url, files=files, timeout=2400)
-            json = response.json()
-            df_original = pd.DataFrame.from_dict(json)
+            # json = response.json()
+            df_original = pd.DataFrame.from_dict(response.json())
+            print(df_original.head())
             # df_original = pd.read_json(url, orient="records")
         else:
             return html.Div("File must be in xlsx format")
@@ -141,13 +144,12 @@ def parse_contents(contents, filename, date):
         return html.Div(["There was an error processing this file."])
 
     cols = [col for col in df_original.columns if not (col.endswith("matching_ids"))]
-    # nmatch = [len(i) - 1 for i in df_original["matching_ids"]]
     matching_ids = [";".join(i) for i in df_original["matching_ids"]]
     ids = list(range(0, len(df_original)))
+
     df = df_original[cols]
 
     df["id"] = ids
-    # df["nmid"] = nmatch
     df["matching_ids"] = matching_ids
 
     print("Data loaded Ok")
@@ -171,17 +173,16 @@ def parse_contents(contents, filename, date):
 )
 def update_output(list_of_contents, list_of_names, list_of_dates):
     print(f"file(s) updated: {list_of_names}")
+    children = []
     if list_of_contents is not None:
         children = [
             parse_contents(c, n, d)
             for c, n, d in zip(list_of_contents, list_of_names, list_of_dates)
         ]
 
-    print(f"UPDATE invoked {last_modified}")
-    columns = [{"id": c, "name": c} for c in df.columns]
-    data = df.to_dict("records")
+    print(f"UPDATE invoked {list_of_dates}")
 
-    return children, columns, data
+    return children, [{"id": c, "name": c} for c in df.columns], df.to_dict("records")
 
 
 @app.callback(
