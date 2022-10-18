@@ -1,9 +1,11 @@
 import os
 import io
+import datetime
 import time
 import urllib.parse
 
 import base64
+
 import requests
 from dash import Dash, dash_table, Input, Output, callback, html, dcc
 from dash.dependencies import Input, Output, State
@@ -53,44 +55,7 @@ app.layout = html.Div(
             multiple=True,
         ),
         html.Div(id="output-data-upload"),
-        dash_table.DataTable(
-            id="respondents-table",
-            data=df.to_dict("records"),
-            columns=[{"id": c, "name": c} for c in df.columns],
-            hidden_columns=["id", "openmedia_id"],
-            style_cell_conditional=[
-                {"if": {"column_id": c}, "textAlign": "left"}
-                for c in ["given_name", "family_name", "affiliation", "labels"]
-            ],
-            # style_data_coditional=[
-            #     {"if": {'column_id': 'nmid', 'filter_query': '{' + field + '}' + ' < 1 '},
-            #         'backgroundColor': '#ffcc00'
-            #      } for field in df.columns
-            #     ],
-            style_as_list_view=True,
-            style_table={"overflowY": "scroll", "height": "400px"},
-            style_cell={
-                "overflow": "hidden",
-                "textOverflow": "ellipsis",
-                "maxWidth": 50,
-                "padding": "5px",
-            },
-            style_header={
-                "backgroundColor": "white",
-                "fontWeight": "bold",
-                "border": "1px solid black",
-            },
-            editable=True,
-            sort_action="native",
-            sort_mode="multi",
-            row_selectable="multi",
-            # row_deletable=True,
-            selected_columns=[],
-            selected_rows=[],
-            page_action="native",
-            # page_current=0,
-            # page_size=15,
-        ),
+        # dash_table.DataTable(id="respondents-table"),
         html.Div(id="container"),
     ]
 )
@@ -103,7 +68,7 @@ def parse_contents(contents, filename, date):
 
     post_data = io.BytesIO(decoded)
 
-    df = pd.DataFrame()
+    df_original = pd.DataFrame()
 
     try:
         # if 'csv' in filename:
@@ -126,32 +91,71 @@ def parse_contents(contents, filename, date):
             # POST data to server
             url = f"http://localhost:5000/uploader?file={filename}"
             files = {"file": post_data}
-            requests.post(url, files=files)
+            response = requests.post(url, files=files, timeout=2400)
+            # json = response.json()
+            df_original = pd.DataFrame.from_dict(response.json())
+            print(df_original.head())
+            # df_original = pd.read_json(url, orient="records")
+        else:
+            return html.Div("File must be in xlsx format")
 
     except Exception as e:
         print(e)
         return html.Div(["There was an error processing this file."])
 
     cols = [col for col in df_original.columns if not (col.endswith("matching_ids"))]
-    # nmatch = [len(i) - 1 for i in df_original["matching_ids"]]
     matching_ids = [";".join(i) for i in df_original["matching_ids"]]
     ids = list(range(0, len(df_original)))
+
     df = df_original[cols]
 
     df["id"] = ids
-    # df["nmid"] = nmatch
     df["matching_ids"] = matching_ids
+
+    print("Data loaded Ok")
 
     return html.Div(
         [
             html.H5(filename),
-            html.H6(datetime.datetime.fromtimestamp(date)),
-            html.Hr(),  # horizontal line
-            # For debugging, display the raw contents provided by the web browser
-            html.Div("Raw Content"),
-            html.Pre(
-                contents[0:200] + "...",
-                style={"whiteSpace": "pre-wrap", "wordBreak": "break-all"},
+            #    html.H6(datetime.datetime.fromtimestamp(date)),
+            #    html.Hr(),  # horizontal line
+            dash_table.DataTable(
+                id="respondents-table",
+                columns=[{"id": c, "name": c} for c in df.columns],
+                hidden_columns=["id", "openmedia_id"],
+                data=df.to_dict("records"),
+                style_cell_conditional=[
+                    {"if": {"column_id": c}, "textAlign": "left"}
+                    for c in ["given_name", "family_name", "affiliation", "labels"]
+                ],
+                # style_data_coditional=[
+                #     {"if": {'column_id': 'nmid', 'filter_query': '{' + field + '}' + ' < 1 '},
+                #         'backgroundColor': '#ffcc00'
+                #      } for field in df.columns
+                #     ],
+                style_as_list_view=True,
+                style_table={"overflowY": "scroll", "height": "400px"},
+                style_cell={
+                    "overflow": "hidden",
+                    "textOverflow": "ellipsis",
+                    "maxWidth": 50,
+                    "padding": "5px",
+                },
+                style_header={
+                    "backgroundColor": "white",
+                    "fontWeight": "bold",
+                    "border": "1px solid black",
+                },
+                editable=True,
+                sort_action="native",
+                sort_mode="multi",
+                row_selectable="multi",
+                # row_deletable=True,
+                selected_columns=[],
+                selected_rows=[],
+                page_action="native",
+                # page_current=0,
+                # page_size=15,
             ),
         ]
     )
@@ -159,18 +163,25 @@ def parse_contents(contents, filename, date):
 
 @app.callback(
     Output("output-data-upload", "children"),
+    # Output("respondents-table", "columns"),
+    # Output("respondents-table", "data"),
     Input("upload-data", "contents"),
     State("upload-data", "filename"),
     State("upload-data", "last_modified"),
 )
 def update_output(list_of_contents, list_of_names, list_of_dates):
-    print(f" file(s) update {list_of_names}")
+    print(f"file(s) updated: {list_of_names}")
+    children = []
     if list_of_contents is not None:
         children = [
             parse_contents(c, n, d)
             for c, n, d in zip(list_of_contents, list_of_names, list_of_dates)
         ]
-        return children
+
+    print(f"UPDATE invoked {list_of_dates}")
+
+    # , [{"id": c, "name": c} for c in df.columns], df.to_dict("records")
+    return children
 
 
 @app.callback(
