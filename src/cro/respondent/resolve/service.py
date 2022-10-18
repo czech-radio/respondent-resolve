@@ -78,8 +78,13 @@ def extract_persons_from_sqlite(dataframe: pd.DataFrame) -> List[Respondent]:
 def load_saved_persons() -> List[Person]:
     con = sqlite3.connect("tmp.sqlite")
     df = pd.read_sql("select * from person", con)
+
+    global df_persons
     df_persons = df.copy()
+
+    global persons
     persons = extract_persons_from_sqlite(df)
+
     print(f"Loaded {len(persons)} persons from local database.")
     return persons
 
@@ -184,8 +189,10 @@ def load_respondents(year: int, week_number: int) -> List[Respondent]:
 
     global df_respondents
     df_respondents = df
+
     global respondents
     respondents = extract_respodents_from_df(df)
+
     print(f"Loaded {len(df)} respondents.")
 
     return respondents
@@ -210,8 +217,10 @@ def load_respondents_from_file(filename: str | None) -> List[Respondent]:
 
     global df_respondents
     df_respondents = df
+
     global respondents
     respondents = extract_respodents_from_df(df)
+
     print(f"Loaded {len(df)} respondents.")
     for i in respondents:
         print(i.asdict())
@@ -245,6 +254,7 @@ def load_persons(connection) -> List[Person]:
 
         global persons
         persons = extract_persons_from_df(persons=persons_tmp)
+
         persons_to_sqlite(persons)
         return persons
 
@@ -380,19 +390,20 @@ def compare_respondents_to_persons(
     for respondent in respondents:
         matching = False
         for person in persons:
-            if (
-                respondent.given_name == person.given_name
-                and respondent.family_name == person.family_name
-                and respondent.affiliation == person.affiliation
-                and len(
-                    [x.lower() for x in respondent.labels if x.lower() in person.labels]
-                )
-                > 0
-            ):
-                respondent.add_matching_id(person.openmedia_id)
-                output.append(respondent)
-                matching = True
-                count = count + 1
+            try:
+                if (
+                    respondent.given_name == person.given_name
+                    and respondent.family_name == person.family_name
+                    and respondent.affiliation == person.affiliation
+                    and (len([x for x in respondent.labels if x in person.labels])) > 0
+                ):
+                    respondent.add_matching_id(person.openmedia_id)
+                    output.append(respondent)
+                    matching = True
+                    count = count + 1
+            except TypeError:
+                print(f"There was an error importing contact: {count}")
+
         if not matching:
             unmatched_tmp.append(respondent)
             unm_cnt = unm_cnt + 1
