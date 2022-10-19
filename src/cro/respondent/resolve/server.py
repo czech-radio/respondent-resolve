@@ -47,11 +47,12 @@ def upload_file():
     global respondents
     respondents = load_respondents_from_file(fn)
 
-    global resolved
-    resolved = compare_respondents_to_persons(respondents=respondents, persons=persons)
+    # seems to be unnecessary ?
+    # global resolved
+    # resolved = compare_respondents_to_persons(respondents=respondents, persons=persons)
 
     output = []
-    for result in resolved:
+    for result in respondents:
         output.append(result.asdict())
 
     return jsonify(output)

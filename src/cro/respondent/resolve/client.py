@@ -86,6 +86,7 @@ def parse_contents(contents, filename, date):
             #        header=None,
             #        engine="openpyxl"
             #        )
+
             print(f" loading {filename}")
 
             # POST data to server
@@ -114,50 +115,44 @@ def parse_contents(contents, filename, date):
 
     print("Data loaded Ok")
 
-    return html.Div(
-        [
-            html.H5(filename),
-            #    html.H6(datetime.datetime.fromtimestamp(date)),
-            #    html.Hr(),  # horizontal line
-            dash_table.DataTable(
-                id="respondents-table",
-                columns=[{"id": c, "name": c} for c in df.columns],
-                hidden_columns=["id", "openmedia_id"],
-                data=df.to_dict("records"),
-                style_cell_conditional=[
-                    {"if": {"column_id": c}, "textAlign": "left"}
-                    for c in ["given_name", "family_name", "affiliation", "labels"]
-                ],
-                # style_data_coditional=[
-                #     {"if": {'column_id': 'nmid', 'filter_query': '{' + field + '}' + ' < 1 '},
-                #         'backgroundColor': '#ffcc00'
-                #      } for field in df.columns
-                #     ],
-                style_as_list_view=True,
-                style_table={"overflowY": "scroll", "height": "400px"},
-                style_cell={
-                    "overflow": "hidden",
-                    "textOverflow": "ellipsis",
-                    "maxWidth": 50,
-                    "padding": "5px",
-                },
-                style_header={
-                    "backgroundColor": "white",
-                    "fontWeight": "bold",
-                    "border": "1px solid black",
-                },
-                editable=True,
-                sort_action="native",
-                sort_mode="multi",
-                row_selectable="multi",
-                # row_deletable=True,
-                selected_columns=[],
-                selected_rows=[],
-                page_action="native",
-                # page_current=0,
-                # page_size=15,
-            ),
-        ]
+    return dash_table.DataTable(
+        id="respondents-table",
+        columns=[{"id": c, "name": c} for c in df.columns],
+        hidden_columns=["id", "openmedia_id"],
+        data=df.to_dict("records"),
+        style_cell_conditional=[
+            {"if": {"column_id": c}, "textAlign": "left"}
+            for c in ["labels"]
+            # for c in ["given_name", "family_name", "affiliation", "labels"]
+        ],
+        # style_data_coditional=[
+        #     {"if": {'column_id': 'nmid', 'filter_query': '{' + field + '}' + ' < 1 '},
+        #         'backgroundColor': '#ffcc00'
+        #      } for field in df.columns
+        #     ],
+        style_as_list_view=True,
+        style_table={"overflowY": "scroll", "height": "400px"},
+        style_cell={
+            # "overflow": "hidden",
+            # "textOverflow": "ellipsis",
+            # "maxWidth": 100,
+            "padding": "5px",
+        },
+        style_header={
+            "backgroundColor": "white",
+            "fontWeight": "bold",
+            "border": "1px solid black",
+        },
+        editable=True,
+        sort_action="native",
+        sort_mode="multi",
+        # row_selectable="multi",
+        # row_deletable=True,
+        selected_columns=[],
+        selected_rows=[],
+        page_action="native",
+        # page_current=0,
+        # page_size=15,
     )
 
 
