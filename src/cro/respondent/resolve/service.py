@@ -562,7 +562,6 @@ def match_persons(
     Match the given respondent with registered persons and return a table of similar persons.
     The respondent matches the person if the name, party and any label matches.
     """
-    import re
 
     # 1. Transform respondent attributes for matching.
 
