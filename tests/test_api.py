@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 
-import pytest
-import os
 
 # from unittest.mock import Mock
 from cro.respondent.resolve.server import create_app

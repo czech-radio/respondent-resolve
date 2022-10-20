@@ -1,17 +1,10 @@
 # -*- coding: utf-8 -*-
 # from threading import Thread
-import pandas as pd
-import json
 import os
 
 
 from flask import Flask, request, jsonify
 from werkzeug.serving import WSGIRequestHandler
-from werkzeug.utils import secure_filename
-
-# from tasks import threaded_task
-
-from cro.respondent.resolve.domain import Respondent
 from cro.respondent.resolve.service import *
 
 # get host sysvars
