@@ -9,7 +9,7 @@ import pandas.io.sql as sqlio
 import psycopg2 as db
 
 from loguru import logger
-from pandas import DataFrame as DataFrame
+from pandas import DataFrame
 
 from cro.respondent.resolve.domain import Respondent, Person
 from timeit import default_timer
