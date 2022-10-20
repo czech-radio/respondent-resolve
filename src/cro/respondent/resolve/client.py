@@ -1,20 +1,13 @@
-import os
 import io
-import datetime
-import time
 import urllib.parse
 
 import base64
 
 import requests
-from dash import Dash, dash_table, Input, Output, callback, html, dcc
+from dash import Dash, dash_table, Input, Output, html, dcc
 from dash.dependencies import Input, Output, State
-import dash_bootstrap_components as dbc
 
 import pandas as pd
-
-from flask import Flask, render_template, request, request_started
-from flask_sqlalchemy import SQLAlchemy
 
 df = pd.DataFrame()
 # df_original = pd.read_json("http://localhost:5000/resolved/2022/36", orient="records")
