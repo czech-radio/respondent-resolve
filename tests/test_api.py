@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 
-# from unittest.mock import Mock
 from cro.respondent.resolve.server import create_app
 
 

@@ -10,19 +10,8 @@ from dash.dependencies import Input, Output, State
 import pandas as pd
 
 df = pd.DataFrame()
-# df_original = pd.read_json("http://localhost:5000/resolved/2022/36", orient="records")
-# cols = [col for col in df_original.columns if not (col.endswith("matching_ids"))]
-## nmatch = [len(i) - 1 for i in df_original["matching_ids"]]
-# matching_ids = [";".join(i) for i in df_original["matching_ids"]]
-# ids = list(range(0, len(df_original)))
-# df = df_original[cols]
-#
-# df["id"] = ids
-## df["nmid"] = nmatch
-# df["matching_ids"] = matching_ids
 
 
-# df = [['openmedia_id','given_name','family_name','affiliation','gender','foreigner','labels']]
 
 print(df.columns)
 
@@ -48,7 +37,6 @@ app.layout = html.Div(
             multiple=True,
         ),
         html.Div(id="output-data-upload"),
-        # dash_table.DataTable(id="respondents-table"),
         html.Div(id="container"),
     ]
 )
@@ -64,13 +52,6 @@ def parse_contents(contents, filename, date):
     df_original = pd.DataFrame()
 
     try:
-        # if 'csv' in filename:
-        #    # Assume that the user uploaded a CSV file
-        #    df_original = pd.read_csv(
-        #        io.StringIO(decoded.decode('utf-8')))
-        # elif 'xls' in filename:
-        #    # Assume that the user uploaded an excel file
-        #    df_original = pd.read_excel(io.BytesIO(decoded))
         if "xlsx" in filename.lower():
             # assume the file is zipped xls
             # df_original = pd.read_excel(
@@ -86,10 +67,8 @@ def parse_contents(contents, filename, date):
             url = f"http://localhost:5000/uploader?file={filename}"
             files = {"file": post_data}
             response = requests.post(url, files=files, timeout=2400)
-            # json = response.json()
             df_original = pd.DataFrame.from_dict(response.json())
             print(df_original.head())
-            # df_original = pd.read_json(url, orient="records")
         else:
             return html.Div("File must be in xlsx format")
 
@@ -118,11 +97,6 @@ def parse_contents(contents, filename, date):
             for c in ["labels"]
             # for c in ["given_name", "family_name", "affiliation", "labels"]
         ],
-        # style_data_coditional=[
-        #     {"if": {'column_id': 'nmid', 'filter_query': '{' + field + '}' + ' < 1 '},
-        #         'backgroundColor': '#ffcc00'
-        #      } for field in df.columns
-        #     ],
         style_as_list_view=True,
         style_table={"overflowY": "scroll", "height": "400px"},
         style_cell={
@@ -139,20 +113,14 @@ def parse_contents(contents, filename, date):
         editable=True,
         sort_action="native",
         sort_mode="multi",
-        # row_selectable="multi",
-        # row_deletable=True,
         selected_columns=[],
         selected_rows=[],
         page_action="native",
-        # page_current=0,
-        # page_size=15,
     )
 
 
 @app.callback(
     Output("output-data-upload", "children"),
-    # Output("respondents-table", "columns"),
-    # Output("respondents-table", "data"),
     Input("upload-data", "contents"),
     State("upload-data", "filename"),
     State("upload-data", "last_modified"),
