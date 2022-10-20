@@ -5,7 +5,7 @@ import base64
 
 import requests
 from dash import Dash, dash_table, Input, Output, html, dcc
-from dash.dependencies import Input, Output, State
+from dash.dependencies import State
 
 import pandas as pd
 
