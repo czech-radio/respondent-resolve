@@ -531,7 +531,7 @@ def match_persons(
     respondent_given_name: str = respondent.given_name.strip().lower()
     respondent_family_name: str = respondent.family_name.strip().lower()
     respondent_affiliation: str = respondent.affiliation.strip().lower()
-    respondent_labels: Set[str] = set([x.strip().lower() for x in respondent.labels])
+    respondent_labels: Set[str] = {x.strip().lower() for x in respondent.labels}
 
     # 2. Match the given respondent with persons.
 
