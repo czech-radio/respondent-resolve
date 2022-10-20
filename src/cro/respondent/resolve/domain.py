@@ -53,22 +53,7 @@ class Respondent(object):
             "matching_ids": self._matching_ids,
         }
 
-    # def serialize(self, values_only = False):
-    #    if values_only:
-    #        return self.__dict__.values()
-    #    return self.__dict__
 
-    # def serialize(self):
-    #    return {
-    #        "openmedia_id": self.openmedia_id(),
-    #        "given_name": self.given_name(),
-    #        "family_name": self.family_name(),
-    #        "affiliation": self.affiliation(),
-    #       "gender": self.gender(),
-    #        "foreigner": self.foreigner(),
-    #        "labels": self.labels(),
-    #        "matching_ids": self.matching_ids(),
-    #    }
 
     @property
     def openmedia_id(self) -> str:

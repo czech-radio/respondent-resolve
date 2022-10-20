@@ -82,10 +82,6 @@ def get_respondents_file():
 
 @server.route("/persons", methods=["GET"])
 def get_persons():
-    # con = create_connection_db(
-    #    f"dbname={AURA_TARGET_NAME} user={AURA_TARGET_USER} host={AURA_TARGET_HOST} port={AURA_TARGET_PORT} password={AURA_TARGET_PASS}"
-    # )
-    # persons = load_persons(con)
 
     output = []
     for person in persons:
@@ -96,10 +92,6 @@ def get_persons():
 
 @server.route("/persons/filter", methods=["GET"])
 def get_person_tmp():
-    # con = create_connection_db(
-    #    f"dbname={AURA_TARGET_NAME} user={AURA_TARGET_USER} host={AURA_TARGET_HOST} port={AURA_TARGET_PORT} password={AURA_TARGET_PASS}"
-    # )
-    # persons = load_persons(con)
 
     print(request.args.to_dict())
     uuid = request.args.get("uuid")  # .format()
@@ -124,11 +116,9 @@ def get_person_tmp():
         )
     else:
         ...
-        # abort(500, "Necesarry arguments were not supplied")
 
     if persons_tmp is None:
         ...
-        # abort(400, "Record were not found")
 
     output = []
 
@@ -141,9 +131,6 @@ def get_person_tmp():
 @server.route("/resolved/<year>/<week>", methods=["GET"])
 def resolved_year_week(year: int, week: int):
 
-    # con = create_connection_db(
-    #    f"dbname={AURA_TARGET_NAME} user={AURA_TARGET_USER} host={AURA_TARGET_HOST} port={AURA_TARGET_PORT} password={AURA_TARGET_PASS}"
-    # )
 
     # new thread
     # persons = load_persons(con)

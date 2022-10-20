@@ -150,28 +150,6 @@ def extract_persons_from_df(persons: pd.DataFrame) -> List[Person]:
     return output
 
 
-# def load_respondents_to_df(year: int, week_number: int) -> pd.DataFrame:
-#
-#    working_directory = f"/mnt/R/GŘ/Strategický rozvoj/Kancelář/Analytics/Source/{year}"
-#    PATH = Path(working_directory)
-#    FULL_PATH = PATH / f"DATA_{year}W{week_number}_TEST.xlsx"
-#
-#    df = pd.read_excel(
-#        FULL_PATH,
-#        sheet_name=0,
-#        header=None,
-#        engine="openpyxl",
-#    )
-#
-#    print(f"Loaded {len(df)} respondents.")
-#
-#    try:
-#        print(f"Normalizing dataframe")
-#        df = normalize_persons(df)
-#    except Exception:
-#        print(f"Error normalizing persons")
-#
-#    return df
 
 
 def load_respondents(year: int, week_number: int) -> List[Respondent]:
@@ -227,8 +205,6 @@ def load_respondents_from_file(filename: str | None) -> List[Respondent]:
 
     return respondents
 
-    # else:
-    #    raise Exception("The file must exist.")
 
 
 def create_connection_db(connection_str: str):
@@ -246,8 +222,6 @@ def load_persons(connection) -> List[Person]:
         )
         logger.info("Fetch respondents finished")
 
-        # normalized = normalize_persons(persons_tmp)
-        # print(normalized)
 
         global df_persons
         df_persons = persons_tmp.copy()
@@ -341,15 +315,6 @@ def compare_name_to_persons(
 
 def list_to_dataframe(input_persons: List[Person]) -> DataFrame:
 
-    # cols = [
-    #        "unique_id",
-    #        "given_name",
-    #        "family_name",
-    #        "affiliation",
-    #        "gender",
-    #        "labels",
-    #        "foreigner",
-    #    ]
 
     # return DataFrame.from_records([p.asdict() for p in input_persons])
     return DataFrame([p.asdict() for p in input_persons])
@@ -437,7 +402,6 @@ def compare_respondents_to_persons(
     #                output.append(respondent)
     #                count = count + 1
 
-    #    print(f"Retrying name-only match... found: {count} matches.")
 
     global unmatched
     unmatched = unique_unmatched
@@ -501,7 +465,6 @@ def normalize_persons(persons: pd.DataFrame) -> pd.DataFrame:
     :return: The normalized copy of original person data.
     """
 
-    # df = pd.DataFrame([x.asdict() for x in persons])
 
     # Get only subset of columns.
     df = persons[
